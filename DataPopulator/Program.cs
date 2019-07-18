@@ -3,16 +3,17 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.Runtime;
 using Bogus;
 using Nito.AsyncEx;
+using Realms.LFS.S3;
 using Realms;
+using Realms.LFS;
 using Realms.Sync;
 using Shared;
-
-using User = Shared.User;
 
 namespace DataPopulator
 {
@@ -27,6 +28,13 @@ namespace DataPopulator
             Directory.CreateDirectory(basePath);
             FullSyncConfiguration.Initialize(UserPersistenceMode.Disabled, basePath: basePath);
 
+            var credentials = new BasicAWSCredentials("access", "secret");
+            FileManager.Initialize(new FileManagerOptions
+            {
+                PersistenceLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                RemoteManagerFactory = () => new S3FileManager(credentials, RegionEndpoint.EUNorth1)
+            });
+
             AsyncContext.Run(MainAsync);
         }
 
@@ -36,7 +44,7 @@ namespace DataPopulator
 
             var startDate = DateTime.Parse("2018-01-01 00:00");
             var endDate = DateTime.Parse("2020-01-01 00:00");
-            var bogusUser = new Faker<User>()
+            var bogusUser = new Faker<FeedUser>()
                 .RuleFor(u => u.FirstName, f => f.Name.FirstName())
                 .RuleFor(u => u.LastName, f => f.Name.LastName());
 
@@ -45,7 +53,7 @@ namespace DataPopulator
                 .RuleFor(i => i.Message, f => f.Lorem.Sentence(f.Random.Int(4, 15)))
                 .RuleFor(i => i.Date, f => f.Date.Between(startDate, endDate));
 
-            var user = await Realms.Sync.User.LoginAsync(Constants.Credentials, Constants.AuthUri);
+            var user = await User.LoginAsync(Constants.Credentials, Constants.AuthUri);
             var config = new FullSyncConfiguration(Constants.RealmUri, user);
             using (var realm = await Realm.GetInstanceAsync(config))
             using (var client = new HttpClient())
@@ -55,8 +63,12 @@ namespace DataPopulator
                 {
                     try
                     {
-                        u.ProfilePictureUrl = $"https://i.pravatar.cc/1000?u={u.Id}";
-                        //u.ProfilePicture = await client.GetByteArrayAsync(u.ProfilePictureUrl);
+                        var pictureUrl = $"https://i.pravatar.cc/1000?u={u.Id}";
+
+                        var bytes = await client.GetByteArrayAsync(pictureUrl);
+                        u.ProfilePictureData = new FileData(new MemoryStream(bytes), pictureUrl);
+
+                        //u.ProfilePicture = bytes;
                     }
                     catch
                     {
@@ -71,8 +83,11 @@ namespace DataPopulator
                     {
                         try
                         {
-                            i.ImageUrl = faker.Image.PicsumUrl(1000, 370);
-                            //i.Image = await client.GetByteArrayAsync(i.ImageUrl);
+                            var imageUrl = faker.Image.PicsumUrl(1000, 370);
+                            var bytes = await client.GetByteArrayAsync(imageUrl);
+                            i.ImageData = new FileData(new MemoryStream(bytes), imageUrl);
+
+                            //i.Image = bytes;
                         }
                         catch
                         {

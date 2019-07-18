@@ -1,9 +1,10 @@
 ﻿using System;
 using Realms;
+using Realms.LFS;
 
 namespace Shared
 {
-    public class User : RealmObject
+    public class FeedUser : RealmObject
     {
         [PrimaryKey]
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -14,6 +15,6 @@ namespace Shared
 
         public byte[] ProfilePicture { get; set; }
 
-        public string ProfilePictureUrl { get; set; }
+        public FileData ProfilePictureData { get; set; }
     }
 }

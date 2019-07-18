@@ -1,15 +1,11 @@
 ﻿using Acr.UserDialogs;
 using Foundation;
-using Newtonsoft.Json;
 using Realms;
 using Realms.Sync;
 using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using UIKit;
 
@@ -27,15 +23,9 @@ namespace LFSDemo
         {
             base.ViewDidLoad();
 
-            this.FeedTableView.Source = new FeedDataSource();
+            FeedTableView.Source = new FeedDataSource();
 
             OpenRealm();
-        }
-
-        public override void DidReceiveMemoryWarning()
-        {
-            base.DidReceiveMemoryWarning();
-            // Release any cached data, images, etc that aren't in use.
         }
 
         private async Task OpenRealm()
@@ -53,7 +43,7 @@ namespace LFSDemo
             try
             {
                 dialog.Show();
-                var user = await Realms.Sync.User.LoginAsync(Constants.Credentials, Constants.AuthUri);
+                var user = await User.LoginAsync(Constants.Credentials, Constants.AuthUri);
                 var config = new FullSyncConfiguration(Constants.RealmUri, user)
                 {
                     OnProgress = (progress) =>
@@ -62,14 +52,14 @@ namespace LFSDemo
                     }
                 };
 
-                //Realm.DeleteRealm(config);
                 _realm = await Realm.GetInstanceAsync(config);
 
                 var feedItems = _realm.All<FeedItem>().OrderByDescending(f => f.Date);
-                var tvSource = this.FeedTableView.Source as FeedDataSource;
+                var tvSource = FeedTableView.Source as FeedDataSource;
                 tvSource.SetSource(feedItems);
+                dialog.Hide();
 
-                this.FeedTableView.ReloadData();
+                FeedTableView.ReloadData();
             }
             catch (Exception ex)
             {
@@ -79,6 +69,7 @@ namespace LFSDemo
             }
             finally
             {
+                await Task.Delay(10);
                 dialog.Hide();
             }
         }

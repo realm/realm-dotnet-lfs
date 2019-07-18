@@ -6,8 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Realm" Version="4.0.1" />
     <PackageReference Include="Bogus" Version="28.0.2" />
+    <PackageReference Include="Realm" Version="4.0.1-PR-1884-2" />
+    <PackageReference Include="Realm.LFS" Version="0.0.5" />
+    <PackageReference Include="Realm.LFS.S3" Version="0.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />

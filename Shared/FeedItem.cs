@@ -1,5 +1,6 @@
 ﻿using System;
 using Realms;
+using Realms.LFS;
 
 namespace Shared
 {
@@ -14,10 +15,10 @@ namespace Shared
 
         public DateTimeOffset Date { get; set; }
 
-        public User Author { get; set; }
+        public FeedUser Author { get; set; }
 
         public byte[] Image { get; set; }
 
-        public string ImageUrl { get; set; }
+        public FileData ImageData { get; set; }
     }
 }

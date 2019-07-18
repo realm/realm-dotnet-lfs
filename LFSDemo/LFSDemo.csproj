@@ -49,6 +49,7 @@
         <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
         <CodesignKey>iPhone Developer</CodesignKey>
         <MtouchDebug>true</MtouchDebug>
+        <MtouchProfiling>true</MtouchProfiling>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
         <DebugType>none</DebugType>
@@ -73,13 +74,19 @@
     <ItemGroup>
       <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
       <PackageReference Include="Realm">
-        <Version>4.0.1</Version>
+        <Version>4.0.1-PR-1884-2</Version>
       </PackageReference>
       <PackageReference Include="Xamarin.SDWebImage">
         <Version>4.4.6</Version>
       </PackageReference>
       <PackageReference Include="Acr.UserDialogs">
         <Version>7.0.4</Version>
+      </PackageReference>
+      <PackageReference Include="Realm.LFS.S3">
+        <Version>0.0.5</Version>
+      </PackageReference>
+      <PackageReference Include="Realm.LFS">
+        <Version>0.0.5</Version>
       </PackageReference>
     </ItemGroup>
     <ItemGroup>
