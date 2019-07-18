@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RootNamespace>Realms.LFS</RootNamespace>
+    <Version>0.0.4</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Realm" Version="4.0.1-PR-1884-2" />
+  </ItemGroup>
+
+</Project>

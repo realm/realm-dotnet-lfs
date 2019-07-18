@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.2</Version>
+    <RootNamespace>Realms.LFS.S3</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.103.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
+  </ItemGroup>
+
+</Project>
