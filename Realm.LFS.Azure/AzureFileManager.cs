@@ -8,7 +8,7 @@ namespace Realms.LFS.Azure
     public class AzureFileManager : RemoteFileManager
     {
         private readonly CloudBlobContainer _container;
-        public AzureFileManager(string connectionString, string container)
+        public AzureFileManager(string connectionString, string container = "realm-lfs-data")
         {
             var account = CloudStorageAccount.Parse(connectionString);
             var client = account.CreateCloudBlobClient();

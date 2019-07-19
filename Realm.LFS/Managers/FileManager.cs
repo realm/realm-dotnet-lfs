@@ -17,7 +17,7 @@ namespace Realms.LFS
 
         public static void Initialize(FileManagerOptions options)
         {
-            _persistenceLocation = options.PersistenceLocation;
+            _persistenceLocation = options.PersistenceLocation ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             _placeholder = options.Placeholder;
             _remoteManagerFactory = options.RemoteManagerFactory ?? FileManagerOptions.DefaultRemoteManagerFactory;
 
