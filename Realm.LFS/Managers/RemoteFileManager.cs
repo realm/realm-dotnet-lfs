@@ -200,7 +200,7 @@ namespace Realms.LFS
                 Logger.Error(ex.Message);
                 _ = Task.Delay(details.RetryAfter).ContinueWith(_ =>
                 {
-                    EnqueueUpload(details.DataId, Math.Min(details.RetryAfter, MaxRetryDelay));
+                    EnqueueUpload(details.DataId, Math.Min(details.RetryAfter * 2, MaxRetryDelay));
                 });
             }
         }
