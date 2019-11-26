@@ -73,20 +73,11 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
-      <PackageReference Include="Realm">
-        <Version>4.0.1-PR-1884-2</Version>
-      </PackageReference>
       <PackageReference Include="Xamarin.SDWebImage">
         <Version>4.4.6</Version>
       </PackageReference>
       <PackageReference Include="Acr.UserDialogs">
         <Version>7.0.4</Version>
-      </PackageReference>
-      <PackageReference Include="Realm.LFS.S3">
-        <Version>0.0.5</Version>
-      </PackageReference>
-      <PackageReference Include="Realm.LFS">
-        <Version>0.0.5</Version>
       </PackageReference>
     </ItemGroup>
     <ItemGroup>
@@ -161,6 +152,18 @@
       <ProjectReference Include="..\Shared\Shared.csproj">
         <Project>{F3E4D974-34DA-4505-923D-AE950D8AF997}</Project>
         <Name>Shared</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj">
+        <Project>{3ED9E430-6DDD-4955-B209-DD82BFD861CF}</Project>
+        <Name>Realm.LFS</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\Realm.LFS.Azure\Realm.LFS.Azure.csproj">
+        <Project>{08941D00-3C73-4FBF-AFE7-B302FD855148}</Project>
+        <Name>Realm.LFS.Azure</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\Realm.LFS.S3\Realm.LFS.S3.csproj">
+        <Project>{320641FC-0596-4D64-97CE-8ACB44F19403}</Project>
+        <Name>Realm.LFS.S3</Name>
       </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

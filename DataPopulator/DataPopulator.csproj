@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="28.0.2" />
-    <PackageReference Include="Realm" Version="4.0.1-PR-1884-2" />
-    <PackageReference Include="Realm.LFS" Version="0.0.5" />
-    <PackageReference Include="Realm.LFS.S3" Version="0.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
+    <ProjectReference Include="..\Realm.LFS.Azure\Realm.LFS.Azure.csproj" />
+    <ProjectReference Include="..\Realm.LFS.S3\Realm.LFS.S3.csproj" />
   </ItemGroup>
 </Project>
