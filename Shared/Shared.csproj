@@ -10,4 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Realm" Version="4.2.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
+  </ItemGroup>
 </Project>

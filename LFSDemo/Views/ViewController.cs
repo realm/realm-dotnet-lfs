@@ -65,7 +65,7 @@ namespace LFSDemo
             {
                 Console.WriteLine(ex);
                 dialog.Hide();
-                await UserDialogs.Instance.AlertAsync("An error occurred", ex.Message);
+                await UserDialogs.Instance.AlertAsync("An error occurred", ex.ToString());
             }
             finally
             {
