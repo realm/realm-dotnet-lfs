@@ -6,24 +6,43 @@ using System.Threading.Tasks;
 
 namespace Realms.LFS
 {
+    /// <summary>
+    /// This is the class that controls how and where local files are stored.
+    /// </summary>
     public static class FileManager
     {
+        private static readonly ConcurrentDictionary<string, RemoteFileManager> _remoteManagers = new();
+
         private static string _persistenceLocation;
         private static Placeholder _placeholder;
         private static Func<RemoteFileManager> _remoteManagerFactory;
-        private static ConcurrentDictionary<string, RemoteFileManager> _remoteManagers = new ConcurrentDictionary<string, RemoteFileManager>();
 
+        /// <summary>
+        /// An event invoked whenever a file has been uploaded successfully.
+        /// </summary>
         public static event EventHandler<FileUploadedEventArgs> OnFileUploaded;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileManager"/> class with the supplied options.
+        /// </summary>
+        /// <param name="options">
+        /// Options that control the behavior of the file manager, such as where files are going to be stored, as well
+        /// as a factory for constructing remote file managers.
+        /// </param>
         public static void Initialize(FileManagerOptions options)
         {
             _persistenceLocation = options.PersistenceLocation ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             _placeholder = options.Placeholder;
-            _remoteManagerFactory = options.RemoteManagerFactory ?? FileManagerOptions.DefaultRemoteManagerFactory;
+            _remoteManagerFactory = options.RemoteManagerFactory;
 
             Argument.Ensure(_remoteManagerFactory != null, "Either a RemoteManagerFactory or DefaultRemoteManagerFactory must be provided.", nameof(options));
         }
 
+        /// <summary>
+        /// Waits for uploads to succeed for the provided Realm.
+        /// </summary>
+        /// <param name="config">The configuration of the Realm for which to wait for uploads.</param>
+        /// <returns>An awaitable task that indicates when uploads are complete.</returns>
         public static Task WaitForUploads(RealmConfigurationBase config)
         {
             return GetManager(config).WaitForUploads();
@@ -100,15 +119,13 @@ namespace Realms.LFS
                 File.Delete(filePath);
             }
 
-            using (var fs = File.OpenWrite(filePath))
+            using var fs = File.OpenWrite(filePath);
+            if (stream.CanSeek)
             {
-                if (stream.CanSeek)
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                }
-
-                stream.CopyTo(fs);
+                stream.Seek(0, SeekOrigin.Begin);
             }
+
+            stream.CopyTo(fs);
         }
 
         internal static void CopyFile(FileLocation location, ObjectId id, string file)

@@ -1,16 +1,16 @@
-using System;
 using Foundation;
 using SDWebImage;
 using Shared;
+using System;
 using UIKit;
 
 namespace LFSDemo
 {
-	public partial class FeedItemCell : UITableViewCell
-	{
-		public FeedItemCell (IntPtr handle) : base (handle)
-		{
-		}
+    public partial class FeedItemCell : UITableViewCell
+    {
+        public FeedItemCell(IntPtr handle) : base(handle)
+        {
+        }
 
         public void LoadData(FeedItem item)
         {
@@ -44,5 +44,5 @@ namespace LFSDemo
             NeedsUpdateConstraints();
             SetNeedsLayout();
         }
-	}
+    }
 }

@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Realms.LFS
 {
+    /// <summary>
+    /// The base class for any remote file manager implementation. This will be used to upload local files
+    /// to a remote storage provider, such as S3 or Azure.
+    /// </summary>
     public abstract class RemoteFileManager
     {
         internal event EventHandler<FileUploadedEventArgs> OnFileUploaded;
@@ -26,6 +30,9 @@ namespace Realms.LFS
         private string _realmPathHash;
         private TaskCompletionSource<object> _completionTcs;
 
+        /// <summary>
+        /// Constructs a new <see cref="RemoteFileManager"/>.
+        /// </summary>
         protected RemoteFileManager()
         {
         }
@@ -67,10 +74,29 @@ namespace Realms.LFS
 
         internal Task WaitForUploads() => _completionTcs?.Task ?? Task.CompletedTask;
 
+        /// <summary>
+        /// Uploads a file with the specified <paramref name="id"/> and path.
+        /// </summary>
+        /// <param name="id">The id of the file.</param>
+        /// <param name="file">The absolute path to the file on the local filesystem.</param>
+        /// <returns>
+        /// A Task wrapping the remote service url where the file will be accessible via http calls.
+        /// </returns>
         protected abstract Task<string> UploadFileCore(string id, string file);
 
+        /// <summary>
+        /// Downloads a file with the specified <paramref name="id"/> and name.
+        /// </summary>
+        /// <param name="id">The id of the file.</param>
+        /// <param name="file">The absolute path to the file on the local filesystem.</param>
+        /// <returns>A Task wrapping the download operation.</returns>
         protected abstract Task DownloadFileCore(string id, string file);
 
+        /// <summary>
+        /// Deletes a file with the specified <paramref name="id"/> from the remote service.
+        /// </summary>
+        /// <param name="id">The id of the file.</param>
+        /// <returns>A Task wrapping the delete operation</returns>
         protected abstract Task DeleteFileCore(string id);
 
         private void EnqueueExisting()

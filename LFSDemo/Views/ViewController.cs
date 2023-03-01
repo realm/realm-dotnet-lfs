@@ -25,7 +25,7 @@ namespace LFSDemo
 
             FeedTableView.Source = new FeedDataSource();
 
-            OpenRealm();
+            _ = OpenRealm();
         }
 
         private async Task OpenRealm()
@@ -43,12 +43,14 @@ namespace LFSDemo
             try
             {
                 dialog.Show();
-                var user = await User.LoginAsync(Constants.Credentials, Constants.AuthUri);
-                var config = new FullSyncConfiguration(Constants.RealmUri, user)
+                var app = App.Create(Constants.AppId);
+                var user = await app.LogInAsync(Constants.Credentials);
+                var config = new FlexibleSyncConfiguration(user)
                 {
-                    OnProgress = (progress) =>
+                    PopulateInitialSubscriptions = (r) =>
                     {
-                        dialog.PercentComplete = (int)(progress.TransferredBytes * 100 / progress.TransferableBytes);
+                        r.Subscriptions.Add(r.All<FeedItem>());
+                        r.Subscriptions.Add(r.All<FeedUser>());
                     }
                 };
 
