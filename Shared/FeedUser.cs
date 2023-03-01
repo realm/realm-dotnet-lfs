@@ -4,7 +4,7 @@ using Realms.LFS;
 
 namespace Shared
 {
-    public class FeedUser : RealmObject
+    public partial class FeedUser : IRealmObject
     {
         [PrimaryKey]
         public string Id { get; set; } = Guid.NewGuid().ToString();

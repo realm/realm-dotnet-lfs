@@ -1,4 +1,5 @@
-﻿using Realms.Helpers;
+﻿using MongoDB.Bson;
+using Realms.Logging;
 using Realms.Sync;
 using System;
 using System.Collections.Concurrent;
@@ -16,9 +17,9 @@ namespace Realms.LFS
         private const int MinRetryDelay = 100;
         private const int MaxExecutors = 10;
 
-        private readonly ConcurrentQueue<UploadDetails> _uploadQueue = new ConcurrentQueue<UploadDetails>();
-        private readonly List<Executor<UploadDetails>> _executors = new List<Executor<UploadDetails>>();
-        private readonly object _executorLock = new object();
+        private readonly ConcurrentQueue<UploadDetails> _uploadQueue = new();
+        private readonly List<Executor<UploadDetails>> _executors = new();
+        private readonly object _executorLock = new();
 
         private BackgroundRunner _runner;
         private RealmConfigurationBase _config;
@@ -32,23 +33,21 @@ namespace Realms.LFS
         internal void Start(RealmConfigurationBase config)
         {
             _config = config;
-            string realmPath;
-            if (_config is SyncConfigurationBase syncConfig)
-            {
-                realmPath = syncConfig.ServerUri.PathAndQuery.Replace("~", syncConfig.User.Identity);
-            }
-            else
-            {
-                realmPath = Path.GetFileNameWithoutExtension(_config.DatabasePath);
-            }
-            _realmPathHash = HashHelper.MD5(realmPath);
 
+            var realmPath = _config switch
+            {
+                FlexibleSyncConfiguration flxConfig => flxConfig.User.Id,
+                PartitionSyncConfiguration pbsConfig => pbsConfig.User.Id + pbsConfig.Partition.ToString(),
+                _ => Path.GetFileNameWithoutExtension(_config.DatabasePath)
+            };
+
+            _realmPathHash = HashHelper.MD5(realmPath);
 
             _runner = new BackgroundRunner(_config);
             EnqueueExisting();
         }
 
-        internal void EnqueueUpload(string dataId, int retryAfter = MinRetryDelay)
+        internal void EnqueueUpload(ObjectId dataId, int retryAfter = MinRetryDelay)
         {
             _uploadQueue.Enqueue(new UploadDetails(dataId, retryAfter));
 
@@ -63,19 +62,10 @@ namespace Realms.LFS
         {
             Argument.Ensure(data.Status == DataStatus.Remote, $"Expected remote data, got {data.Status}", nameof(data));
 
-            return DownloadFileCore(GetId(data.Id), destinationFile);
+            return DownloadFileCore(GetRemoteId(data.Id), destinationFile);
         }
 
-        internal Task WaitForUploads()
-        {
-            var tcs = _completionTcs;
-            if (tcs == null)
-            {
-                return Task.FromResult<object>(null);
-            }
-
-            return tcs.Task;
-        }
+        internal Task WaitForUploads() => _completionTcs?.Task ?? Task.CompletedTask;
 
         protected abstract Task<string> UploadFileCore(string id, string file);
 
@@ -143,7 +133,7 @@ namespace Realms.LFS
                     realm.Refresh();
                     data = realm.Find<FileData>(details.DataId);
                 }
-                return data != null && data.Status == DataStatus.Local;
+                return data?.Status == DataStatus.Local;
             });
         }
 
@@ -157,27 +147,23 @@ namespace Realms.LFS
             try
             {
                 var filePath = FileManager.GetFilePath(_config, details.DataId);
-                Console.WriteLine($"Uploading on {Environment.CurrentManagedThreadId}");
-                var url = await UploadFileCore(GetId(details.DataId), filePath);
-                Console.WriteLine($"Updating Realm on {Environment.CurrentManagedThreadId}");
+                var url = await UploadFileCore(GetRemoteId(details.DataId), filePath);
                 var success = await _runner.Execute((realm) =>
                 {
-                    using (var transaction = realm.BeginWrite())
+                    using var transaction = realm.BeginWrite();
+                    var data = realm.Find<FileData>(details.DataId);
+
+                    if (data == null)
                     {
-                        var data = realm.Find<FileData>(details.DataId);
-
-                        if (data == null)
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
-
-                        data.Url = url;
-                        data.Status = DataStatus.Remote;
-                        transaction.Commit();
-
-                        return true;
+                        transaction.Rollback();
+                        return false;
                     }
+
+                    data.Url = url;
+                    data.Status = DataStatus.Remote;
+                    transaction.Commit();
+
+                    return true;
                 });
 
                 if (success)
@@ -191,13 +177,13 @@ namespace Realms.LFS
                 }
                 else
                 {
-                    Logger.Error($"Could not find data with Id: {details.DataId}");
-                    await DeleteFileCore(details.DataId);
+                    Logger.Default.Log(LogLevel.Error, $"Realm.LFS: Could not find data with Id: {details.DataId}");
+                    await DeleteFileCore(GetRemoteId(details.DataId));
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex.Message);
+                Logger.Default.Log(LogLevel.Error, $"Realm.LFS: An error occurred while uploading item: {ex}");
                 _ = Task.Delay(details.RetryAfter).ContinueWith(_ =>
                 {
                     EnqueueUpload(details.DataId, Math.Min(details.RetryAfter * 2, MaxRetryDelay));
@@ -205,14 +191,14 @@ namespace Realms.LFS
             }
         }
 
-        private string GetId(string dataId) => $"{_realmPathHash}/{dataId}";
+        private string GetRemoteId(ObjectId dataId) => $"{_realmPathHash}/{dataId}";
 
         private class UploadDetails
         {
-            public string DataId { get; }
+            public ObjectId DataId { get; }
             public int RetryAfter { get; }
 
-            public UploadDetails(string dataId, int retryAfter)
+            public UploadDetails(ObjectId dataId, int retryAfter)
             {
                 DataId = dataId;
                 RetryAfter = retryAfter;

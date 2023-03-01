@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 
 namespace Realms.LFS
 {
-    public class FileData : RealmObject
+    public partial class FileData : IRealmObject
     {
         [PrimaryKey]
-        public string Id { get; private set; } = Guid.NewGuid().ToString();
+        public ObjectId Id { get; private set; } = ObjectId.GenerateNewId();
 
         public Task<Stream> GetStream() => FileManager.ReadFile(this);
 
@@ -32,14 +32,8 @@ namespace Realms.LFS
             Status = DataStatus.Local;
         }
 
-        private FileData()
+        partial void OnManaged()
         {
-        }
-
-        protected override void OnManaged()
-        {
-            base.OnManaged();
-
             if (Status == DataStatus.Local)
             {
                 // TODO: That's not very efficient - it checks for file existence

@@ -1,4 +1,4 @@
-﻿using Realms.Helpers;
+﻿using MongoDB.Bson;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -29,9 +29,9 @@ namespace Realms.LFS
             return GetManager(config).WaitForUploads();
         }
 
-        internal static Stream ReadFile(FileLocation location, string id)
+        internal static Stream ReadFile(FileLocation location, ObjectId id)
         {
-            var path = Path.Combine(GetPath(location), id);
+            var path = Path.Combine(GetPath(location), id.ToString());
             return ReadFileCore(path, generatePlaceholder: false);
         }
 
@@ -56,9 +56,9 @@ namespace Realms.LFS
             return File.OpenRead(dataPath);
         }
 
-        internal static string GetFilePath(RealmConfigurationBase config, string id)
+        internal static string GetFilePath(RealmConfigurationBase config, ObjectId id)
         {
-            return Path.Combine(GetPath(config), id);
+            return Path.Combine(GetPath(config), id.ToString());
         }
 
         internal static string GetFilePath(FileData data)
@@ -68,7 +68,7 @@ namespace Realms.LFS
                 return GetFilePath(data.Realm.Config, data.Id);
             }
 
-            return Path.Combine(GetPath(FileLocation.Temporary), data.Id);
+            return Path.Combine(GetPath(FileLocation.Temporary), data.Id.ToString());
         }
 
         internal static bool FileExists(FileLocation location, string id)
@@ -92,9 +92,9 @@ namespace Realms.LFS
             return Stream.Null;
         }
 
-        internal static void WriteFile(FileLocation location, string id, Stream stream)
+        internal static void WriteFile(FileLocation location, ObjectId id, Stream stream)
         {
-            var filePath = Path.Combine(GetPath(location), id);
+            var filePath = Path.Combine(GetPath(location), id.ToString());
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -111,9 +111,9 @@ namespace Realms.LFS
             }
         }
 
-        internal static void CopyFile(FileLocation location, string id, string file)
+        internal static void CopyFile(FileLocation location, ObjectId id, string file)
         {
-            var targetFile = Path.Combine(GetPath(location), id);
+            var targetFile = Path.Combine(GetPath(location), id.ToString());
             File.Copy(file, targetFile, overwrite: true);
         }
 
@@ -121,10 +121,10 @@ namespace Realms.LFS
         {
             Argument.Ensure(data.IsManaged, "Expected data to be managed.", nameof(data));
 
-            var sourceFile = Path.Combine(GetPath(fromLocation), data.Id);
+            var sourceFile = Path.Combine(GetPath(fromLocation), data.Id.ToString());
             if (File.Exists(sourceFile))
             {
-                var targetFile = Path.Combine(GetPath(data.Realm.Config), data.Id);
+                var targetFile = Path.Combine(GetPath(data.Realm.Config), data.Id.ToString());
                 File.Move(sourceFile, targetFile);
                 GetManager(data.Realm.Config).EnqueueUpload(data.Id);
             }

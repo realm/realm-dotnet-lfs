@@ -1,6 +1,6 @@
 ﻿namespace Realms.LFS
 {
-    public enum FileLocation
+    internal enum FileLocation
     {
         System,
         Temporary,

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using MongoDB.Bson;
 
 namespace Realms.LFS
 {
     public class FileUploadedEventArgs : EventArgs
     {
-        public string FileDataId { get; internal set; }
+        public ObjectId FileDataId { get; internal set; }
 
         public string FilePath { get; internal set; }
 

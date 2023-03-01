@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using MongoDB.Bson;
 
 namespace Realms.LFS
 {
     public class Placeholder
     {
-        private const string PlaceholderId = "__placeholder";
+        private static readonly ObjectId PlaceholderId = ObjectId.Empty;
 
         private readonly Func<string, Stream> _generator;
 
