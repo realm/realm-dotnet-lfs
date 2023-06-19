@@ -55,6 +55,10 @@ public class FunctionsFileManager : RemoteFileManager
         var response = await CallSignFunction<UploadResponse>(id, OperationType.Upload);
         var fileStream = new FileStream(file, FileMode.Open);
         var streamContent = new StreamContent(fileStream);
+        
+        // TODO: this doesn't do multipart uploads. See
+        // https://stackoverflow.com/questions/29974416/how-do-i-upload-to-amazon-s3-using-net-httpclient-without-using-their-sdk
+        // for example how to do it.
         await _client.PutAsync(new Uri(response.PresignedUrl), streamContent);
 
         return response.CanonicalUrl;
@@ -76,10 +80,10 @@ public class FunctionsFileManager : RemoteFileManager
 
     private class FunctionPayload
     {
-        public string FileId { get; }
+        public string FileId { get; set;  }
         
         [BsonRepresentation(BsonType.String)]
-        public OperationType Operation { get; }
+        public OperationType Operation { get; set; }
 
         public FunctionPayload(string id, OperationType operation)
         {
