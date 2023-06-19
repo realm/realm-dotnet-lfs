@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.0.2</Version>
     <RootNamespace>Realms.LFS.S3</RootNamespace>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>11</LangVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

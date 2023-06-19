@@ -15,10 +15,10 @@ namespace Shared
 
         public DateTimeOffset Date { get; set; }
 
-        public FeedUser Author { get; set; }
+        public FeedUser? Author { get; set; }
 
         public byte[] Image { get; set; }
 
-        public FileData ImageData { get; set; }
+        public FileData? ImageData { get; set; }
     }
 }

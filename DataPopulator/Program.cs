@@ -22,7 +22,7 @@ namespace DataPopulator
         private const int UsersCount = 200;
         private const int FeedItemsCount = 10 * UsersCount;
 
-        private static App _app;
+        private static App _app = null!;
 
         private static void Main(string[] args)
         {
@@ -37,7 +37,7 @@ namespace DataPopulator
             FileManager.Initialize(new FileManagerOptions
             {
                 PersistenceLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                RemoteManagerFactory = () => new S3FileManager(credentials, RegionEndpoint.EUNorth1)
+                RemoteManagerFactory = (config) => new S3FileManager(config, credentials, RegionEndpoint.EUNorth1)
             });
 
             AsyncContext.Run(MainAsync);

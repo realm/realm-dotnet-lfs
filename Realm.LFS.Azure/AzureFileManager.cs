@@ -16,11 +16,13 @@ namespace Realms.LFS.Azure
         /// Initializes a new instance of the <see cref="AzureFileManager"/> class with the
         /// supplied <paramref name="connectionString"/>.
         /// </summary>
+        /// <param name="config">The config of the Realm this file manager is tracking.</param>
         /// <param name="connectionString">The connection string used to connect to Azure storage.</param>
         /// <param name="container">
         /// An optional argument indicating the container that will be used to upload data to.
         /// </param>
-        public AzureFileManager(string connectionString, string container = "realm-lfs-data")
+        public AzureFileManager(RealmConfigurationBase config, string connectionString, string container = "realm-lfs-data")
+            : base(config)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             var client = account.CreateCloudBlobClient();
@@ -36,7 +38,7 @@ namespace Realms.LFS.Azure
         }
 
         /// <inheritdoc/>
-        protected override async Task DownloadFileCore(string id, string file)
+        protected override async Task DownloadFileCore(string id, string file, FileData _)
         {
             var context = new SingleTransferContext();
             var blob = _container.GetBlockBlobReference(id);

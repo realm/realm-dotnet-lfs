@@ -13,17 +13,17 @@ namespace Realms.LFS
         /// <summary>
         /// The id of the <see cref="FileData"/> object that has been uploaded.
         /// </summary>
-        public ObjectId FileDataId { get; internal set; }
+        public ObjectId FileDataId { get; }
 
         /// <summary>
         /// The file path of the local file.
         /// </summary>
-        public string FilePath { get; internal set; }
+        public string FilePath { get; }
 
         /// <summary>
         /// The Realm configuration for the Realm owning the file.
         /// </summary>
-        public RealmConfigurationBase RealmConfig { get; internal set; }
+        public RealmConfigurationBase RealmConfig { get; }
 
         /// <summary>
         /// A method that allows you to delete the local copy if you no longer need it.
@@ -33,6 +33,11 @@ namespace Realms.LFS
             File.Delete(FilePath);
         }
 
-        internal FileUploadedEventArgs() { }
+        internal FileUploadedEventArgs(ObjectId id, string filePath, RealmConfigurationBase realmConfig)
+        {
+            FileDataId = id;
+            FilePath = filePath;
+            RealmConfig = realmConfig;
+        }
     }
 }

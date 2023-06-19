@@ -15,6 +15,6 @@ namespace Shared
 
         public byte[] ProfilePicture { get; set; }
 
-        public FileData ProfilePictureData { get; set; }
+        public FileData? ProfilePictureData { get; set; }
     }
 }

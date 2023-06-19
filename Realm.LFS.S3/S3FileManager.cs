@@ -19,12 +19,14 @@ namespace Realms.LFS.S3
         /// Initializes a new instance of the <see cref="S3FileManager"/> class with the
         /// supplied <paramref name="credentials"/>.
         /// </summary>
+        /// <param name="config">The config of the Realm this file manager is tracking.</param>
         /// <param name="credentials">The credentials used to connect to the S3 bucket.</param>
         /// <param name="region">The region where the bucket is located</param>
         /// <param name="bucket">
         /// An optional argument indicating the bucket that will be used to upload data to.
         /// </param>
-        public S3FileManager(AWSCredentials credentials, RegionEndpoint region, string bucket = "realm-lfs-data")
+        public S3FileManager(RealmConfigurationBase config, AWSCredentials credentials, RegionEndpoint region, string bucket = "realm-lfs-data")
+            : base(config)
         {
             _s3Client = new AmazonS3Client(credentials, region);
             _bucket = bucket;
@@ -41,7 +43,7 @@ namespace Realms.LFS.S3
         }
 
         /// <inheritdoc/>
-        protected override async Task DownloadFileCore(string id, string file)
+        protected override async Task DownloadFileCore(string id, string file, FileData _)
         {
             var fileTransferUtility = new TransferUtility(_s3Client);
             await fileTransferUtility.DownloadAsync(new TransferUtilityDownloadRequest

@@ -8,19 +8,14 @@ namespace Realms.LFS
     public class FileManagerOptions
     {
         /// <summary>
-        /// A placeholder to be returned for images where we haven't downloaded the remote file yet. 
-        /// </summary>
-        public Placeholder Placeholder { get; set; }
-
-        /// <summary>
         /// The location where files will be stored.
         /// </summary>
-        public string PersistenceLocation { get; set; }
+        public string? PersistenceLocation { get; init; }
 
         /// <summary>
         /// A factory for constructing <see cref="RemoteFileManager"/>. A new manager will be constructed
         /// for each Realm you open.
         /// </summary>
-        public Func<RemoteFileManager> RemoteManagerFactory { get; set; }
+        public required Func<RealmConfigurationBase, RemoteFileManager> RemoteManagerFactory { get; init; }
     }
 }
