@@ -13,7 +13,7 @@ namespace Realms.LFS
         /// <summary>
         /// The id of the <see cref="FileData"/> object that has been uploaded.
         /// </summary>
-        public ObjectId FileDataId { get; }
+        public Guid FileDataId { get; }
 
         /// <summary>
         /// The file path of the local file.
@@ -33,7 +33,7 @@ namespace Realms.LFS
             File.Delete(FilePath);
         }
 
-        internal FileUploadedEventArgs(ObjectId id, string filePath, RealmConfigurationBase realmConfig)
+        internal FileUploadedEventArgs(Guid id, string filePath, RealmConfigurationBase realmConfig)
         {
             FileDataId = id;
             FilePath = filePath;

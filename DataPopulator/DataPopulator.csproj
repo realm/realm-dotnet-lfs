@@ -11,6 +11,7 @@
     <PackageReference Include="Realm" Version="11.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Realm.LFS.Functions\Realm.LFS.Functions.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
     <ProjectReference Include="..\Realm.LFS.Azure\Realm.LFS.Azure.csproj" />

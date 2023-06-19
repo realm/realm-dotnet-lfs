@@ -30,11 +30,11 @@ public static class FileManager
     /// </param>
     public static void Initialize(FileManagerOptions options)
     {
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        Argument.Ensure(_remoteManagerFactory != null, "Either a RemoteManagerFactory or DefaultRemoteManagerFactory must be provided.", nameof(options));
-
         _persistenceLocation = options.PersistenceLocation ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         _remoteManagerFactory = options.RemoteManagerFactory;
+        
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        Argument.Ensure(_remoteManagerFactory != null, "Either a RemoteManagerFactory or DefaultRemoteManagerFactory must be provided.", nameof(options));
     }
 
     /// <summary>
@@ -69,14 +69,14 @@ public static class FileManager
         }
 
         var tempPath = dataPath + ".temp";
-        await GetManager(data.Realm.Config).DownloadFile(data, tempPath);
+        await GetManager(data.Realm!.Config).DownloadFile(data, tempPath);
 
         File.Move(tempPath, dataPath);
 
         return File.OpenRead(dataPath);
     }
 
-    internal static string GetFilePath(RealmConfigurationBase config, ObjectId id)
+    internal static string GetFilePath(RealmConfigurationBase config, Guid id)
     {
         return Path.Combine(GetPath(config), id.ToString());
     }
@@ -85,7 +85,7 @@ public static class FileManager
     {
         if (data.IsManaged)
         {
-            return GetFilePath(data.Realm.Config, data.Id);
+            return GetFilePath(data.Realm!.Config, data.Id);
         }
 
         return Path.Combine(GetPath(FileLocation.Temporary), data.Id.ToString());
@@ -97,7 +97,7 @@ public static class FileManager
         return File.Exists(path);
     }
 
-    internal static void WriteFile(FileLocation location, ObjectId id, Stream stream)
+    internal static void WriteFile(FileLocation location, Guid id, Stream stream)
     {
         var filePath = Path.Combine(GetPath(location), id.ToString());
         if (File.Exists(filePath))
@@ -114,7 +114,7 @@ public static class FileManager
         stream.CopyTo(fs);
     }
 
-    internal static void CopyFile(FileLocation location, ObjectId id, string file)
+    internal static void CopyFile(FileLocation location, Guid id, string file)
     {
         var targetFile = Path.Combine(GetPath(location), id.ToString());
         File.Copy(file, targetFile, overwrite: true);
@@ -127,7 +127,7 @@ public static class FileManager
         var sourceFile = Path.Combine(GetPath(fromLocation), data.Id.ToString());
         if (File.Exists(sourceFile))
         {
-            var targetFile = Path.Combine(GetPath(data.Realm.Config), data.Id.ToString());
+            var targetFile = Path.Combine(GetPath(data.Realm!.Config), data.Id.ToString());
             File.Move(sourceFile, targetFile);
             GetManager(data.Realm.Config).EnqueueUpload(data.Id);
         }

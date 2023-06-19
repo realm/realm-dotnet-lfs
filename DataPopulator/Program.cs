@@ -1,10 +1,7 @@
-﻿using Amazon;
-using Amazon.Runtime;
-using Bogus;
+﻿using Bogus;
 using Nito.AsyncEx;
 using Realms;
 using Realms.LFS;
-using Realms.LFS.S3;
 using Realms.Sync;
 using Shared;
 using System;
@@ -33,11 +30,10 @@ namespace DataPopulator
                 BaseFilePath = basePath,
             });
 
-            var credentials = new BasicAWSCredentials(Constants.AwsAccessKey, Constants.AwsSecretKey);
             FileManager.Initialize(new FileManagerOptions
             {
                 PersistenceLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                RemoteManagerFactory = (config) => new S3FileManager(config, credentials, RegionEndpoint.EUNorth1)
+                RemoteManagerFactory = (config) => new FunctionsFileManager(config, "DataFunction")
             });
 
             AsyncContext.Run(MainAsync);
@@ -68,6 +64,9 @@ namespace DataPopulator
                 }
             };
             using var realm = await Realm.GetInstanceAsync(config);
+            await FileManager.WaitForUploads(config);
+            await Task.Delay(100);
+            await FileManager.WaitForUploads(config);
             using var client = new HttpClient();
             var users = bogusUser.Generate(UsersCount);
             await ExecuteInParallel(users, async u =>
@@ -75,7 +74,7 @@ namespace DataPopulator
                 try
                 {
                     var pictureUrl = $"https://i.pravatar.cc/1000?u={u.Id}";
-
+            
                     var bytes = await client.GetByteArrayAsync(pictureUrl);
                     u.ProfilePictureData = new FileData(new MemoryStream(bytes), pictureUrl);
                 }
@@ -84,7 +83,7 @@ namespace DataPopulator
                 }
                 realm.Write(() => realm.Add(u));
             }, 50);
-
+            
             var feedItems = bogusFeedItem.Generate(FeedItemsCount);
             await ExecuteInParallel(feedItems, async i =>
             {
@@ -95,14 +94,14 @@ namespace DataPopulator
                         var imageUrl = faker.Image.PicsumUrl(1000, 370);
                         var bytes = await client.GetByteArrayAsync(imageUrl);
                         i.ImageData = new FileData(new MemoryStream(bytes), imageUrl);
-
+            
                         //i.Image = bytes;
                     }
                     catch
                     {
                     }
                 }
-
+            
                 i.Author = faker.PickRandom(users);
                 realm.Write(() =>
                 {

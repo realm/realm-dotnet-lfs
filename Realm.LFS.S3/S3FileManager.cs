@@ -43,7 +43,7 @@ namespace Realms.LFS.S3
         }
 
         /// <inheritdoc/>
-        protected override async Task DownloadFileCore(string id, string file, FileData _)
+        protected override async Task DownloadFileCore(string id, string file)
         {
             var fileTransferUtility = new TransferUtility(_s3Client);
             await fileTransferUtility.DownloadAsync(new TransferUtilityDownloadRequest

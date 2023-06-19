@@ -6,7 +6,7 @@ namespace Shared
 {
     public partial class FeedItem : IRealmObject
     {
-        [PrimaryKey]
+        [PrimaryKey, MapTo("_id")]
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string Title { get; set; }
@@ -16,8 +16,6 @@ namespace Shared
         public DateTimeOffset Date { get; set; }
 
         public FeedUser? Author { get; set; }
-
-        public byte[] Image { get; set; }
 
         public FileData? ImageData { get; set; }
     }

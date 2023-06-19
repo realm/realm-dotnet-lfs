@@ -38,7 +38,7 @@ namespace Realms.LFS.Azure
         }
 
         /// <inheritdoc/>
-        protected override async Task DownloadFileCore(string id, string file, FileData _)
+        protected override async Task DownloadFileCore(string id, string file)
         {
             var context = new SingleTransferContext();
             var blob = _container.GetBlockBlobReference(id);

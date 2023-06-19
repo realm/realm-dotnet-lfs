@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Realms.Sync;
 
 // ReSharper disable ClassNeverInstantiated.Local
@@ -13,15 +15,13 @@ namespace Realms.LFS;
 public class FunctionsFileManager : RemoteFileManager
 {
     private readonly string _function;
-    private readonly bool _usePublicDownloads;
     private readonly HttpClient _client;
     private readonly User _user;
     
-    public FunctionsFileManager(RealmConfigurationBase config, string function, bool usePublicDownloads = true, HttpMessageHandler? httpHandler = null)
+    public FunctionsFileManager(RealmConfigurationBase config, string function, HttpMessageHandler? httpHandler = null)
         : base(config)
     {
         _function = function;
-        _usePublicDownloads = usePublicDownloads;
 
         _user = config switch
         {
@@ -35,34 +35,14 @@ public class FunctionsFileManager : RemoteFileManager
     /// <inheritdoc/>
     protected override async Task DeleteFileCore(string id)
     {
-        var payload = new FunctionPayload
-        {
-            FileId = id,
-            Operation = OperationType.Delete
-        };
-
-        var response = await _user.Functions.CallAsync<DeleteResponse>(_function, payload);
-
-        if (!response.Success)
-        {
-            throw new Exception($"Failed to delete object with Id: {id}: {response.Error}");
-        }
+        await CallSignFunction<DeleteResponse>(id, OperationType.Delete);
     }
 
     /// <inheritdoc/>
-    protected override async Task DownloadFileCore(string id, string file, FileData fileData)
+    protected override async Task DownloadFileCore(string id, string file)
     {
-        string url;
-        if (_usePublicDownloads)
-        {
-            url = fileData.Url ?? throw new ArgumentException("This method should only be invoked with remote fileData",
-                nameof(fileData));
-        }
-        else
-        {
-            var response = await GetPresignedUrl(id, OperationType.Download);
-            url = response.PresignedUrl;
-        }
+        var response = await CallSignFunction<DownloadResponse>(id, OperationType.Download);
+        var url = response.Url;
 
         var stream = await _client.GetStreamAsync(new Uri(url));
         var fileStream = new FileStream(file, FileMode.Create);
@@ -72,45 +52,64 @@ public class FunctionsFileManager : RemoteFileManager
     /// <inheritdoc/>
     protected override async Task<string> UploadFileCore(string id, string file)
     {
-        var response = await GetPresignedUrl(id, OperationType.Upload);
+        var response = await CallSignFunction<UploadResponse>(id, OperationType.Upload);
         var fileStream = new FileStream(file, FileMode.Open);
         var streamContent = new StreamContent(fileStream);
         await _client.PutAsync(new Uri(response.PresignedUrl), streamContent);
 
-        return response.CanonicalUrl!;
+        return response.CanonicalUrl;
     }
 
-    private async Task<SignedUrlResponse> GetPresignedUrl(string id, OperationType operation)
+    private async Task<T> CallSignFunction<T>(string id, OperationType operation)
+        where T : ResponseBase
     {
-        var payload = new FunctionPayload
-        {
-            FileId = id,
-            Operation = operation
-        };
+        var payload = new FunctionPayload(id, OperationType.Upload);
+        var response = await _user.Functions.CallAsync<T>(_function, payload);
 
-        return await _user.Functions.CallAsync<SignedUrlResponse>(_function, payload);
+        if (!response.Success)
+        {
+            throw new Exception($"Failed to {operation} object with Id: {id}: {response.Error}");
+        }
+
+        return response;
     }
 
     private class FunctionPayload
     {
-        public required string FileId { get; init; }
+        public string FileId { get; }
         
-        public required OperationType Operation { get; init; }
+        [BsonRepresentation(BsonType.String)]
+        public OperationType Operation { get; }
+
+        public FunctionPayload(string id, OperationType operation)
+        {
+            FileId = id;
+            Operation = operation;
+        }
     }
 
-    private class SignedUrlResponse
-    {
-        public required string PresignedUrl { get; set; }
-        
-        public string? CanonicalUrl { get; set; }
-    }
-
-    private class DeleteResponse
+    private abstract class ResponseBase
     {
         [MemberNotNullWhen(false, nameof(Error))]
         public bool Success { get; set; }
         
         public string? Error { get; set; }
+    }
+    
+    private class UploadResponse : ResponseBase
+    {
+        public required string PresignedUrl { get; set; }
+        
+        public required string CanonicalUrl { get; set; }
+    }
+    
+    private class DownloadResponse : ResponseBase
+    {
+        public required string Url { get; set; }
+    }
+
+    private class DeleteResponse : ResponseBase
+    {
     }
 
     private enum OperationType

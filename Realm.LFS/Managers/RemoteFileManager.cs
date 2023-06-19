@@ -1,9 +1,7 @@
-﻿using MongoDB.Bson;
-using Realms.Logging;
+﻿using Realms.Logging;
 using Realms.Sync;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -56,7 +54,7 @@ namespace Realms.LFS
             EnqueueExisting();
         }
 
-        internal void EnqueueUpload(ObjectId dataId, int retryAfter = MinRetryDelay)
+        internal void EnqueueUpload(Guid dataId, int retryAfter = MinRetryDelay)
         {
             _uploadQueue.Enqueue(new UploadDetails(dataId, retryAfter));
             _executors.AddIfNecessary();
@@ -66,7 +64,7 @@ namespace Realms.LFS
         {
             Argument.Ensure(data.Status == DataStatus.Remote, $"Expected remote data, got {data.Status}", nameof(data));
 
-            return DownloadFileCore(GetRemoteId(data.Id), destinationFile, data);
+            return DownloadFileCore(GetRemoteId(data.Id), destinationFile);
         }
 
         internal Task WaitForUploads() => _executors.WaitForCompletion();
@@ -86,9 +84,8 @@ namespace Realms.LFS
         /// </summary>
         /// <param name="remoteId">The remote id of the file.</param>
         /// <param name="file">The absolute path to the file on the local filesystem.</param>
-        /// <param name="data">The <see cref="FileData"/> wrapping the file.</param>
         /// <returns>A Task wrapping the download operation.</returns>
-        protected abstract Task DownloadFileCore(string remoteId, string file, FileData data);
+        protected abstract Task DownloadFileCore(string remoteId, string file);
 
         /// <summary>
         /// Deletes a file with the specified <paramref name="remoteId"/> from the remote service.
@@ -179,14 +176,14 @@ namespace Realms.LFS
             }
         }
 
-        private string GetRemoteId(ObjectId dataId) => $"{_realmPathHash}/{dataId}";
+        private string GetRemoteId(Guid dataId) => $"{_realmPathHash}/{dataId}";
 
         private class UploadDetails
         {
-            public ObjectId DataId { get; }
+            public Guid DataId { get; }
             public int RetryAfter { get; }
 
-            public UploadDetails(ObjectId dataId, int retryAfter)
+            public UploadDetails(Guid dataId, int retryAfter)
             {
                 DataId = dataId;
                 RetryAfter = retryAfter;
@@ -202,7 +199,7 @@ namespace Realms.LFS
             return (IQueryable<FileData>)result;
         }
 
-        private static FileData? GetFileData(Realm realm, ObjectId id) =>
+        private static FileData? GetFileData(Realm realm, Guid id) =>
             GetFileDatas(realm).FirstOrDefault(d => d.Id == id);
     }
 }

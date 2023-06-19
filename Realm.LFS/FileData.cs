@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ public partial class FileData : IEmbeddedObject
     /// <summary>
     /// Gets the unique id of the <see cref="FileData"/>.
     /// </summary>
-    public ObjectId Id { get; private set; } = ObjectId.GenerateNewId();
+    public Guid Id { get; private set; } = Guid.NewGuid();
 
     /// <summary>
     /// Gets a stream containing the binary data represented by this <see cref="FileData"/>.
