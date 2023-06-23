@@ -6,7 +6,7 @@ namespace Demo.iOS
 {
     public partial class FeedItemCell : UITableViewCell
     {
-        public FeedItemCell(IntPtr handle) : base(handle)
+        public FeedItemCell(ObjCRuntime.NativeHandle handle) : base(handle)
         {
         }
 
