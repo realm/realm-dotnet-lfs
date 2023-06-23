@@ -7,7 +7,7 @@
 using Foundation;
 using System.CodeDom.Compiler;
 
-namespace LFSDemo
+namespace Demo.iOS
 {
 	[Register ("FeedItemCell")]
 	partial class FeedItemCell
@@ -26,7 +26,7 @@ namespace LFSDemo
 
 		[Outlet]
 		UIKit.UIImageView ProfileImageView { get; set; }
-		
+
 		void ReleaseDesignerOutlets ()
 		{
 			if (ImageView != null) {

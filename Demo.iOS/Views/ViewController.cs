@@ -1,19 +1,13 @@
 ﻿using Acr.UserDialogs;
-using Foundation;
 using Realms;
 using Realms.Sync;
 using Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using UIKit;
 
-namespace LFSDemo
+namespace Demo.iOS
 {
     public partial class ViewController : UIViewController
     {
-        private Realm _realm;
+        private Realm _realm = null!;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -58,7 +52,7 @@ namespace LFSDemo
 
                 var feedItems = _realm.All<FeedItem>().OrderByDescending(f => f.Date);
                 var tvSource = FeedTableView.Source as FeedDataSource;
-                tvSource.SetSource(feedItems);
+                tvSource!.SetSource(feedItems);
                 dialog.Hide();
 
                 FeedTableView.ReloadData();
@@ -78,7 +72,7 @@ namespace LFSDemo
 
         private class FeedDataSource : UITableViewSource
         {
-            private FeedItem[] _items = new FeedItem[0];
+            private FeedItem[] _items = Array.Empty<FeedItem>();
 
             public void SetSource(IEnumerable<FeedItem> items)
             {
@@ -88,7 +82,7 @@ namespace LFSDemo
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.DequeueReusableCell("FeedItemCell") as FeedItemCell;
-                cell.LoadData(_items[indexPath.Row]);
+                cell!.LoadData(_items[indexPath.Row]);
                 return cell;
             }
 

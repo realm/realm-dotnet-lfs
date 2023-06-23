@@ -4,9 +4,9 @@ namespace Shared
 {
     public static class Constants
     {
-        public const string Username = "my-user";
-        public const string Password = "pass";
-        public const string AppId = "<fill-me>";
+        private const string Username = "foo@me.com";
+        private const string Password = "123456";
+        public const string AppId = "lfsdemo-ciacp";
 
         public static readonly Credentials Credentials = Credentials.EmailPassword(Username, Password);
     }

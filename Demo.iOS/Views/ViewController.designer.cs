@@ -7,14 +7,14 @@
 using Foundation;
 using System.CodeDom.Compiler;
 
-namespace LFSDemo
+namespace Demo.iOS
 {
 	[Register ("ViewController")]
 	partial class ViewController
 	{
 		[Outlet]
 		UIKit.UITableView FeedTableView { get; set; }
-		
+
 		void ReleaseDesignerOutlets ()
 		{
 			if (FeedTableView != null) {

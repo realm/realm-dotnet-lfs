@@ -67,7 +67,7 @@ public class FunctionsFileManager : RemoteFileManager
     private async Task<T> CallSignFunction<T>(string id, OperationType operation)
         where T : ResponseBase
     {
-        var payload = new FunctionPayload(id, OperationType.Upload);
+        var payload = new FunctionPayload(id, operation);
         var response = await _user.Functions.CallAsync<T>(_function, payload);
 
         if (!response.Success)

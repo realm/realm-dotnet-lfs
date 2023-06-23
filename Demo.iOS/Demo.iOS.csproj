@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net7.0-ios</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <CodesignKey>iPhone Developer</CodesignKey>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Realm.LFS.Functions\Realm.LFS.Functions.csproj" />
+        <ProjectReference Include="..\Shared\Shared.csproj" />
+        <PackageReference Include="SDWebImage.iOS" Version="2.0.0" />
+        <PackageReference Include="Acr.UserDialogs" Version="8.0.1" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Resources\" />
+    </ItemGroup>
+</Project>

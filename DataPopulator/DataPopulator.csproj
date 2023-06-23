@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="28.0.2" />
-    <PackageReference Include="Realm" Version="11.1.0" />
+    <PackageReference Include="Realm" Version="11.1.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Realm.LFS.Functions\Realm.LFS.Functions.csproj" />
