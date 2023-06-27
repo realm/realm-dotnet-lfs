@@ -18,14 +18,16 @@ jobs:
         run: echo "::add-matcher::.github/problem-matchers/csc.json"
       - name: Register msvc problem matcher
         run: echo "::add-matcher::.github/problem-matchers/msvc.json"
-      - name: Pack Realm.LFS
-        run: dotnet pack Realm.LFS
-      - name: Pack Realm.LFS.Azure
-        run: dotnet pack Realm.LFS.Azure
-      - name: Pack Realm.LFS.S3
-        run: dotnet pack Realm.LFS.S3
-      - name: Pack Realm.LFS.Functions
-        run: dotnet pack Realm.LFS.Functions
+      - name: Build packages
+        run: |
+          dotnet build Realm.LFS -restore
+          dotnet pack Realm.LFS
+          dotnet build Realm.LFS.Azure -restore
+          dotnet pack Realm.LFS.Azure
+          dotnet build Realm.LFS.S3 -restore
+          dotnet pack Realm.LFS.S3
+          dotnet build Realm.LFS.Functions -restore
+          dotnet pack Realm.LFS.Functions
       - name: Store artifacts
         uses: actions/upload-artifact@v3
         with:
