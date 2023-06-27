@@ -1,0 +1,35 @@
+name: PR build
+on:
+  pull_request
+env:
+  REALM_DISABLE_ANALYTICS: true
+  DOTNET_NOLOGO: true
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build packages
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Register csc problem matcher
+        run: echo "::add-matcher::.github/problem-matchers/csc.json"
+      - name: Register msvc problem matcher
+        run: echo "::add-matcher::.github/problem-matchers/msvc.json"
+      - name: Pack Realm.LFS
+        run: dotnet pack Realm.LFS
+      - name: Pack Realm.LFS.Azure
+        run: dotnet pack Realm.LFS.Azure
+      - name: Pack Realm.LFS.S3
+        run: dotnet pack Realm.LFS.S3
+      - name: Pack Realm.LFS.Functions
+        run: dotnet pack Realm.LFS.Functions
+      - name: Store artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Realm.LFS Packages
+          path: ${{ github.workspace }}/packages/*
+          retention-days: ${{ github.event_name != 'pull_request' && 30 || 1 }}
+          if-no-files-found: error

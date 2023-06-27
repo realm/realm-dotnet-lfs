@@ -1,22 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RootNamespace>Realms.LFS</RootNamespace>
-    <Version>0.0.4</Version>
-    <LangVersion>11</LangVersion>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Nullable>enable</Nullable>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PolySharp" Version="1.13.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Realm" Version="11.1.2" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
   </ItemGroup>
+
+  <Import Project="..\AssemblyInfo.props " />
 </Project>

@@ -1,13 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.2</Version>
     <RootNamespace>Realms.LFS.S3</RootNamespace>
-    <LangVersion>11</LangVersion>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Nullable>enable</Nullable>
+    <Product>Realm LFS S3</Product>
+    <Description>A RemoteFileManager for Realm.LFS that uploads files to AWS S3.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,4 +14,5 @@
     <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
   </ItemGroup>
 
+  <Import Project="..\AssemblyInfo.props " />
 </Project>

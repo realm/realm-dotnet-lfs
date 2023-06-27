@@ -1,0 +1,37 @@
+apiRules:
+- exclude:
+    uidRegex: ^Realms\.LFS\.Functions\.FunctionsFileManager\..*Core
+    type: Method
+- exclude:
+    uidRegex: ^Realms\.LFS\.S3\.S3FileManager\..*Core
+    type: Method
+- exclude:
+    uidRegex: ^Realms\.LFS\.Azure\.AzureFileManager\..*Core
+    type: Method
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.RealmSchema
+    type: Field
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.BacklinksCount
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.DynamicApi
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.IsFrozen
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.IsManaged
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.IsValid
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.Realm
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.ObjectSchema
+    type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.Parent
+    type: Property
