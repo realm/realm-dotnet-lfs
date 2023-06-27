@@ -18,16 +18,33 @@ jobs:
         run: echo "::add-matcher::.github/problem-matchers/csc.json"
       - name: Register msvc problem matcher
         run: echo "::add-matcher::.github/problem-matchers/msvc.json"
+      - name: Set version suffix
+        id: set-version-suffix
+        #! Build suffix is pr-1234.5 for pr builds or alpha.123 for branch builds.
+        run: |
+          $suffix = ""
+          if ($env:GITHUB_EVENT_NAME -eq "pull_request")
+          {
+            if (-Not "${{ github.head_ref }}".Contains("release"))
+            {
+              $suffix = "pr-${{ github.event.number }}.$env:GITHUB_RUN_NUMBER"
+            }
+          }
+          else
+          {
+            $suffix = "alpha.$env:GITHUB_RUN_NUMBER"
+          }
+          echo "build_suffix=$suffix" >> $Env:GITHUB_OUTPUT
       - name: Build packages
         run: |
           dotnet build Realm.LFS -restore
-          dotnet pack Realm.LFS
+          dotnet pack Realm.LFS -p:VersionSuffix=${{ steps.set-version-suffix.outputs.build_suffix }}
           dotnet build Realm.LFS.Azure -restore
-          dotnet pack Realm.LFS.Azure
+          dotnet pack Realm.LFS.Azure -p:VersionSuffix=${{ steps.set-version-suffix.outputs.build_suffix }}
           dotnet build Realm.LFS.S3 -restore
-          dotnet pack Realm.LFS.S3
+          dotnet pack Realm.LFS.S3 -p:VersionSuffix=${{ steps.set-version-suffix.outputs.build_suffix }}
           dotnet build Realm.LFS.Functions -restore
-          dotnet pack Realm.LFS.Functions
+          dotnet pack Realm.LFS.Functions -p:VersionSuffix=${{ steps.set-version-suffix.outputs.build_suffix }}
       - name: Store artifacts
         uses: actions/upload-artifact@v3
         with:
