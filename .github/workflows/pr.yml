@@ -22,7 +22,7 @@ jobs:
         id: set-version-suffix
         #! Build suffix is pr-1234.5 for pr builds or alpha.123 for branch builds.
         run: |
-          $suffix = ""
+          $suffix=""
           if ($env:GITHUB_EVENT_NAME -eq "pull_request")
           {
             if (-Not "${{ github.head_ref }}".Contains("release"))
@@ -35,6 +35,7 @@ jobs:
             $suffix = "alpha.$env:GITHUB_RUN_NUMBER"
           }
           echo "build_suffix=$suffix" >> $Env:GITHUB_OUTPUT
+        shell: pwsh
       - name: Build packages
         run: |
           dotnet build Realm.LFS -restore
