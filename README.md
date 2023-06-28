@@ -8,9 +8,18 @@ Using binary data (i.e. `byte[]` properties) with Realm is supported but very in
 
 ## Usage
 
-For the most part, just replace `byte[]` properties with `FileData` ones:
+To initialize the SDK, the minimum configuration you need to do is to configure the remote manager factory:
 
 ```csharp
+FileManager.Initialize(new FileManagerOptions
+{
+    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "MyDataFunction")
+});
+```
+
+Then, replace `byte[]` properties with `FileData` ones:
+
+```diff
 public class Recipe : RealmObject
 {
     public string Name { get; set; }
@@ -19,21 +28,9 @@ public class Recipe : RealmObject
 
     public IList<Ingredient> Ingredients { get; set; }
 
-    // Replace this
-    public byte[] Photo { get; set; }
-
-    // with this
-    public FileData Photo { get; set; }
+-    public byte[] Photo { get; set; }
++    public FileData Photo { get; set; }
 }
-```
-
-To initialize the SDK, the minimum configuration you need to do is to configure the remote manager factory:
-
-```csharp
-FileManager.Initialize(new FileManagerOptions
-{
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "MyDataFunction")
-});
 ```
 
 The `FileData` class can be constructed from a `Stream` - if you already have a `byte[]`, that can be used to create a `MemoryStream`.
@@ -65,6 +62,10 @@ public void PopulateImage(Recipe recipe)
     }
 }
 ```
+
+## Documentation
+
+API docs can be found at https://nirinchev.github.io/realm-lfs.
 
 ## Customization
 
