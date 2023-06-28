@@ -47,9 +47,9 @@ public static class FileManager
         return GetManager(config).WaitForUploads();
     }
 
-    internal static Stream? ReadFile(FileLocation location, ObjectId id)
+    internal static Stream? ReadFile(ObjectId id)
     {
-        var path = Path.Combine(GetPath(location), id.ToString());
+        var path = Path.Combine(GetTempPath(), id.ToString());
         return File.Exists(path) ? File.OpenRead(path) : null;
     }
 
@@ -88,18 +88,18 @@ public static class FileManager
             return GetFilePath(data.Realm!.Config, data.Id);
         }
 
-        return Path.Combine(GetPath(FileLocation.Temporary), data.Id.ToString());
+        return Path.Combine(GetTempPath(), data.Id.ToString());
     }
 
-    internal static bool FileExists(FileLocation location, string id)
+    internal static bool FileExists(string id)
     {
-        var path = Path.Combine(GetPath(location), id);
+        var path = Path.Combine(GetTempPath(), id);
         return File.Exists(path);
     }
 
-    internal static void WriteFile(FileLocation location, Guid id, Stream stream)
+    internal static void WriteFile(Guid id, Stream stream)
     {
-        var filePath = Path.Combine(GetPath(location), id.ToString());
+        var filePath = Path.Combine(GetTempPath(), id.ToString());
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -114,17 +114,17 @@ public static class FileManager
         stream.CopyTo(fs);
     }
 
-    internal static void CopyFile(FileLocation location, Guid id, string file)
+    internal static void CopyFile(Guid id, string file)
     {
-        var targetFile = Path.Combine(GetPath(location), id.ToString());
+        var targetFile = Path.Combine(GetTempPath(), id.ToString());
         File.Copy(file, targetFile, overwrite: true);
     }
 
-    internal static void UploadFile(FileLocation fromLocation, FileData data)
+    internal static void UploadFile(FileData data)
     {
         Argument.Ensure(data.IsManaged, "Expected data to be managed.", nameof(data));
 
-        var sourceFile = Path.Combine(GetPath(fromLocation), data.Id.ToString());
+        var sourceFile = Path.Combine(GetTempPath(), data.Id.ToString());
         if (File.Exists(sourceFile))
         {
             var targetFile = Path.Combine(GetPath(data.Realm!.Config), data.Id.ToString());
@@ -133,9 +133,9 @@ public static class FileManager
         }
     }
 
-    private static string GetPath(FileLocation location)
+    private static string GetTempPath()
     {
-        var folderPath = Path.Combine(_persistenceLocation, location.ToString());
+        var folderPath = Path.Combine(_persistenceLocation, "temporary");
         Directory.CreateDirectory(folderPath);
         return folderPath;
     }

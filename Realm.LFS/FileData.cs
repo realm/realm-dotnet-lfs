@@ -56,7 +56,7 @@ public partial class FileData : IEmbeddedObject
     /// <param name="name">The name of the file.</param>
     public FileData(Stream data, string? name = null)
     {
-        FileManager.WriteFile(FileLocation.Temporary, Id, data);
+        FileManager.WriteFile(Id, data);
         Name = name;
         Status = DataStatus.Local;
     }
@@ -67,7 +67,7 @@ public partial class FileData : IEmbeddedObject
         {
             // TODO: That's not very efficient - it checks for file existence
             // on every instantiation - we should be able to do it more efficiently 
-            FileManager.UploadFile(FileLocation.Temporary, this);
+            FileManager.UploadFile(this);
         }
     }
 
