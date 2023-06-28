@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Realms.LFS.Azure</RootNamespace>
+    <Product>Realm LFS Azure</Product>
+    <Description>A RemoteFileManager for Realm.LFS that uploads files to Azure blob storage.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="0.12.0" />
+    <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
   </ItemGroup>
 
+  <Import Project="..\AssemblyInfo.props " />
 </Project>

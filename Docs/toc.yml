@@ -1,0 +1,5 @@
+- name: API Documentation
+  href: api/
+  homepage: api/Realms.LFS.yml
+- name: Changelog
+  href: ../CHANGELOG.md

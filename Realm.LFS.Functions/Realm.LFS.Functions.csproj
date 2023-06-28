@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Realms.LFS.Functions</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Product>Realm LFS Atlas Functions</Product>
+    <Description>A RemoteFileManager for Realm.LFS that calls an Atlas Function to obtain a
+      pre-signed url for file uploads.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.LFS\Realm.LFS.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\AssemblyInfo.props " />
+</Project>

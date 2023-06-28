@@ -1,21 +1,43 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using System;
 using System.IO;
 
 namespace Realms.LFS
 {
+    /// <summary>
+    /// The event args describing that a file has been successfully uploaded by the
+    /// <see cref="RemoteFileManager"/>.
+    /// </summary>
     public class FileUploadedEventArgs : EventArgs
     {
-        public string FileDataId { get; internal set; }
+        /// <summary>
+        /// The id of the <see cref="FileData"/> object that has been uploaded.
+        /// </summary>
+        public Guid FileDataId { get; }
 
-        public string FilePath { get; internal set; }
+        /// <summary>
+        /// The file path of the local file.
+        /// </summary>
+        public string FilePath { get; }
 
-        public RealmConfigurationBase RealmConfig { get; internal set; }
+        /// <summary>
+        /// The Realm configuration for the Realm owning the file.
+        /// </summary>
+        public RealmConfigurationBase RealmConfig { get; }
 
+        /// <summary>
+        /// A method that allows you to delete the local copy if you no longer need it.
+        /// </summary>
         public void DeleteLocalCopy()
         {
             File.Delete(FilePath);
         }
 
-        internal FileUploadedEventArgs() { }
+        internal FileUploadedEventArgs(Guid id, string filePath, RealmConfigurationBase realmConfig)
+        {
+            FileDataId = id;
+            FilePath = filePath;
+            RealmConfig = realmConfig;
+        }
     }
 }

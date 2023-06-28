@@ -4,17 +4,15 @@ using Realms.LFS;
 
 namespace Shared
 {
-    public class FeedUser : RealmObject
+    public partial class FeedUser : IRealmObject
     {
-        [PrimaryKey]
+        [PrimaryKey, MapTo("_id")]
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
-        public byte[] ProfilePicture { get; set; }
-
-        public FileData ProfilePictureData { get; set; }
+        public FileData? ProfilePictureData { get; set; }
     }
 }

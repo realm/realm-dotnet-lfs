@@ -1,44 +1,46 @@
-﻿using System;
+﻿using Bogus;
+using Nito.AsyncEx;
+using Realms;
+using Realms.LFS;
+using Realms.Sync;
+using Shared;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Amazon;
-using Amazon.Runtime;
-using Bogus;
-using Nito.AsyncEx;
-using Realms.LFS.S3;
-using Realms;
-using Realms.LFS;
-using Realms.Sync;
-using Shared;
+using Realms.LFS.Functions;
 
 namespace DataPopulator
 {
-    class Program
+    internal class Program
     {
         private const int UsersCount = 200;
         private const int FeedItemsCount = 10 * UsersCount;
 
-        static void Main(string[] args)
+        private static App _app = null!;
+
+        private static void Main(string[] args)
         {
             var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Realms");
             Directory.CreateDirectory(basePath);
-            FullSyncConfiguration.Initialize(UserPersistenceMode.Disabled, basePath: basePath);
+            _app = App.Create(new AppConfiguration(Constants.AppId)
+            {
+                BaseFilePath = basePath,
+            });
 
-            var credentials = new BasicAWSCredentials("access", "secret");
             FileManager.Initialize(new FileManagerOptions
             {
                 PersistenceLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                RemoteManagerFactory = () => new S3FileManager(credentials, RegionEndpoint.EUNorth1)
+                RemoteManagerFactory = (config) => new FunctionsFileManager(config, "DataFunction")
             });
 
             AsyncContext.Run(MainAsync);
         }
 
-        static async Task MainAsync()
+        private static async Task MainAsync()
         {
             var faker = new Faker();
 
@@ -53,61 +55,67 @@ namespace DataPopulator
                 .RuleFor(i => i.Message, f => f.Lorem.Sentence(f.Random.Int(4, 15)))
                 .RuleFor(i => i.Date, f => f.Date.Between(startDate, endDate));
 
-            var user = await User.LoginAsync(Constants.Credentials, Constants.AuthUri);
-            var config = new FullSyncConfiguration(Constants.RealmUri, user);
-            using (var realm = await Realm.GetInstanceAsync(config))
-            using (var client = new HttpClient())
+            var user = await _app.LogInAsync(Constants.Credentials);
+            var config = new FlexibleSyncConfiguration(user)
             {
-                var users = bogusUser.Generate(UsersCount);
-                await ExecuteInParallel(users, async u =>
+                PopulateInitialSubscriptions = (r) =>
+                {
+                    r.Subscriptions.Add(r.All<FeedItem>());
+                    r.Subscriptions.Add(r.All<FeedUser>());
+                }
+            };
+            using var realm = await Realm.GetInstanceAsync(config);
+            await FileManager.WaitForUploads(config);
+            await Task.Delay(100);
+            await FileManager.WaitForUploads(config);
+            using var client = new HttpClient();
+            var users = bogusUser.Generate(UsersCount);
+            await ExecuteInParallel(users, async u =>
+            {
+                try
+                {
+                    var pictureUrl = $"https://i.pravatar.cc/1000?u={u.Id}";
+            
+                    var bytes = await client.GetByteArrayAsync(pictureUrl);
+                    u.ProfilePictureData = new FileData(new MemoryStream(bytes), pictureUrl);
+                }
+                catch
+                {
+                }
+                realm.Write(() => realm.Add(u));
+            }, 50);
+            
+            var feedItems = bogusFeedItem.Generate(FeedItemsCount);
+            await ExecuteInParallel(feedItems, async i =>
+            {
+                if (faker.Random.Bool(0.6f))
                 {
                     try
                     {
-                        var pictureUrl = $"https://i.pravatar.cc/1000?u={u.Id}";
-
-                        var bytes = await client.GetByteArrayAsync(pictureUrl);
-                        u.ProfilePictureData = new FileData(new MemoryStream(bytes), pictureUrl);
-
-                        //u.ProfilePicture = bytes;
+                        var imageUrl = faker.Image.PicsumUrl(1000, 370);
+                        var bytes = await client.GetByteArrayAsync(imageUrl);
+                        i.ImageData = new FileData(new MemoryStream(bytes), imageUrl);
+            
+                        //i.Image = bytes;
                     }
                     catch
                     {
                     }
-                    realm.Write(() => realm.Add(u));
-                }, 50);
-
-                var feedItems = bogusFeedItem.Generate(FeedItemsCount);
-                await ExecuteInParallel(feedItems, async i =>
+                }
+            
+                i.Author = faker.PickRandom(users);
+                realm.Write(() =>
                 {
-                    if (faker.Random.Bool(0.6f))
-                    {
-                        try
-                        {
-                            var imageUrl = faker.Image.PicsumUrl(1000, 370);
-                            var bytes = await client.GetByteArrayAsync(imageUrl);
-                            i.ImageData = new FileData(new MemoryStream(bytes), imageUrl);
-
-                            //i.Image = bytes;
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                    i.Author = faker.PickRandom(users);
-                    realm.Write(() =>
-                    {
-                        realm.Add(i);
-                    });
-                }, 50);
-            }
+                    realm.Add(i);
+                });
+            }, 50);
         }
 
         private static async Task ExecuteInParallel<T>(IEnumerable<T> collection,
                                            Func<T, Task> processor,
                                            int degreeOfParallelism)
         {
-            var queue = new ConcurrentQueue<T>(collection);
+            ConcurrentQueue<T> queue = new(collection);
             var tasks = Enumerable.Range(0, degreeOfParallelism).Select(async _ =>
             {
                 while (queue.TryDequeue(out var item))

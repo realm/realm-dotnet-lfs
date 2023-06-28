@@ -2,14 +2,20 @@
 
 namespace Realms.LFS
 {
+    /// <summary>
+    /// The options controlling the <see cref="FileManager"/> behavior.
+    /// </summary>
     public class FileManagerOptions
     {
-        public Placeholder Placeholder { get; set; }
+        /// <summary>
+        /// The location where files will be stored.
+        /// </summary>
+        public string? PersistenceLocation { get; init; }
 
-        public string PersistenceLocation { get; set; }
-
-        public Func<RemoteFileManager> RemoteManagerFactory { get; set; }
-
-        public static Func<RemoteFileManager> DefaultRemoteManagerFactory { get; set; }
+        /// <summary>
+        /// A factory for constructing <see cref="RemoteFileManager"/>. A new manager will be constructed
+        /// for each Realm you open.
+        /// </summary>
+        public required Func<RealmConfigurationBase, RemoteFileManager> RemoteManagerFactory { get; init; }
     }
 }

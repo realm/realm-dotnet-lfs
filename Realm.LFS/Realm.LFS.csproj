@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RootNamespace>Realms.LFS</RootNamespace>
-    <Version>0.0.4</Version>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Realm" Version="4.2.0" />
+    <PackageReference Include="Realm" Version="11.1.2" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
   </ItemGroup>
+
+  <Import Project="..\AssemblyInfo.props " />
 </Project>

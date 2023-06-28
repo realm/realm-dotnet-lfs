@@ -1,16 +1,13 @@
-﻿using System;
-using Realms.Sync;
+﻿using Realms.Sync;
 
 namespace Shared
 {
     public static class Constants
     {
-        public static readonly Uri AuthUri = new Uri("https://lfsdemo.de1a.cloud.realm.io");
-        public const string Username = "my-user";
-        public const string Password = "pass";
+        private const string Username = "foo@me.com";
+        private const string Password = "123456";
+        public const string AppId = "lfsdemo-ciacp";
 
-        public static readonly Credentials Credentials = Credentials.UsernamePassword(Username, Password);
-
-        public static readonly Uri RealmUri = new Uri("/~/myrealm", UriKind.Relative);
+        public static readonly Credentials Credentials = Credentials.EmailPassword(Username, Password);
     }
 }

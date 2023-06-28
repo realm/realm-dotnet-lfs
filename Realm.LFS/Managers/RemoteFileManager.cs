@@ -1,93 +1,104 @@
-﻿using Realms.Helpers;
+﻿using Realms.Logging;
 using Realms.Sync;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Realms.LFS
 {
+    /// <summary>
+    /// The base class for any remote file manager implementation. This will be used to upload local files
+    /// to a remote storage provider, such as S3 or Azure.
+    /// </summary>
     public abstract class RemoteFileManager
     {
-        internal event EventHandler<FileUploadedEventArgs> OnFileUploaded;
+        internal event EventHandler<FileUploadedEventArgs>? OnFileUploaded;
 
         private const int MaxRetryDelay = 60000;
         private const int MinRetryDelay = 100;
         private const int MaxExecutors = 10;
 
-        private readonly ConcurrentQueue<UploadDetails> _uploadQueue = new ConcurrentQueue<UploadDetails>();
-        private readonly List<Executor<UploadDetails>> _executors = new List<Executor<UploadDetails>>();
-        private readonly object _executorLock = new object();
+        private readonly ConcurrentQueue<UploadDetails> _uploadQueue = new();
+        private readonly ExecutorList<UploadDetails> _executors;
 
-        private BackgroundRunner _runner;
-        private RealmConfigurationBase _config;
-        private string _realmPathHash;
-        private TaskCompletionSource<object> _completionTcs;
+        private readonly BackgroundRunner _runner;
+        private readonly string _realmPathHash;
 
-        protected RemoteFileManager()
+        /// <summary>
+        /// The config of the Realm this manager tracks. 
+        /// </summary>
+        protected RealmConfigurationBase RealmConfig { get; }
+
+        /// <summary>
+        /// Constructs a new <see cref="RemoteFileManager"/>.
+        /// </summary>
+        protected RemoteFileManager(RealmConfigurationBase config)
         {
-        }
+            RealmConfig = config;
 
-        internal void Start(RealmConfigurationBase config)
-        {
-            _config = config;
-            string realmPath;
-            if (_config is SyncConfigurationBase syncConfig)
+            _executors = new(MaxExecutors, _uploadQueue, UploadItem);
+
+            var realmPath = RealmConfig switch
             {
-                realmPath = syncConfig.ServerUri.PathAndQuery.Replace("~", syncConfig.User.Identity);
-            }
-            else
-            {
-                realmPath = Path.GetFileNameWithoutExtension(_config.DatabasePath);
-            }
+                FlexibleSyncConfiguration flxConfig => flxConfig.User.Id,
+                PartitionSyncConfiguration pbsConfig => $"{pbsConfig.User.Id}{pbsConfig.Partition}",
+                _ => Path.GetFileNameWithoutExtension(RealmConfig.DatabasePath)
+            };
+
             _realmPathHash = HashHelper.MD5(realmPath);
 
-
-            _runner = new BackgroundRunner(_config);
+            _runner = new BackgroundRunner(RealmConfig);
             EnqueueExisting();
         }
 
-        internal void EnqueueUpload(string dataId, int retryAfter = MinRetryDelay)
+        internal void EnqueueUpload(Guid dataId, int retryAfter = MinRetryDelay)
         {
             _uploadQueue.Enqueue(new UploadDetails(dataId, retryAfter));
-
-            var executorCount = _executors.Count;
-            if (_uploadQueue.Count > 2 * executorCount && executorCount < MaxExecutors)
-            {
-                AddExecutor();
-            }
+            _executors.AddIfNecessary();
         }
 
         internal Task DownloadFile(FileData data, string destinationFile)
         {
             Argument.Ensure(data.Status == DataStatus.Remote, $"Expected remote data, got {data.Status}", nameof(data));
 
-            return DownloadFileCore(GetId(data.Id), destinationFile);
+            return DownloadFileCore(GetRemoteId(data.Id), destinationFile);
         }
 
-        internal Task WaitForUploads()
-        {
-            var tcs = _completionTcs;
-            if (tcs == null)
-            {
-                return Task.FromResult<object>(null);
-            }
+        internal Task WaitForUploads() => _executors.WaitForCompletion();
 
-            return tcs.Task;
-        }
+        /// <summary>
+        /// Uploads a file with the specified <paramref name="remoteId"/> and path.
+        /// </summary>
+        /// <param name="remoteId">The id of the file.</param>
+        /// <param name="file">The absolute path to the file on the local filesystem.</param>
+        /// <returns>
+        /// A Task wrapping the remote service url where the file will be accessible via http calls.
+        /// </returns>
+        protected abstract Task<string> UploadFileCore(string remoteId, string file);
 
-        protected abstract Task<string> UploadFileCore(string id, string file);
+        /// <summary>
+        /// Downloads a file with the specified <paramref name="remoteId"/> and name.
+        /// </summary>
+        /// <param name="remoteId">The remote id of the file.</param>
+        /// <param name="file">The absolute path to the file on the local filesystem.</param>
+        /// <returns>A Task wrapping the download operation.</returns>
+        protected abstract Task DownloadFileCore(string remoteId, string file);
 
-        protected abstract Task DownloadFileCore(string id, string file);
-
-        protected abstract Task DeleteFileCore(string id);
+        /// <summary>
+        /// Deletes a file with the specified <paramref name="remoteId"/> from the remote service.
+        /// </summary>
+        /// <param name="remoteId">The id of the file.</param>
+        /// <returns>A Task wrapping the delete operation</returns>
+        protected abstract Task DeleteFileCore(string remoteId);
 
         private void EnqueueExisting()
         {
             _runner.Execute((realm) =>
             {
-                var unprocessedDatas = realm.All<FileData>().Filter($"StatusInt == {(int)DataStatus.Local}");
+                var unprocessedDatas = GetFileDatas(realm).Filter($"StatusInt == {(int)DataStatus.Local}");
                 foreach (var item in unprocessedDatas)
                 {
                     EnqueueUpload(item.Id);
@@ -95,41 +106,9 @@ namespace Realms.LFS
             });
         }
 
-        private void AddExecutor()
-        {
-            lock (_executorLock)
-            {
-                if (_executors.Count >= MaxExecutors)
-                {
-                    return;
-                }
-
-                var executor = new Executor<UploadDetails>(_uploadQueue, UploadItem, RemoveExecutor);
-                _executors.Add(executor);
-
-                if (_executors.Count == 1)
-                {
-                    _completionTcs = new TaskCompletionSource<object>();
-                }
-            }
-        }
-
-        private void RemoveExecutor(Executor<UploadDetails> executor)
-        {
-            lock (_executorLock)
-            {
-                _executors.Remove(executor);
-
-                if (_executors.Count == 0)
-                {
-                    _completionTcs.TrySetResult(null);
-                }
-            }
-        }
-
         private async Task<bool> ShouldUpload(UploadDetails details)
         {
-            var filePath = FileManager.GetFilePath(_config, details.DataId);
+            var filePath = FileManager.GetFilePath(RealmConfig, details.DataId);
             if (!File.Exists(filePath))
             {
                 return false;
@@ -137,13 +116,14 @@ namespace Realms.LFS
 
             return await _runner.Execute(realm =>
             {
-                var data = realm.Find<FileData>(details.DataId);
+                var data = GetFileData(realm, details.DataId);
                 if (data == null)
                 {
                     realm.Refresh();
-                    data = realm.Find<FileData>(details.DataId);
+                    data = GetFileData(realm, details.DataId);
                 }
-                return data != null && data.Status == DataStatus.Local;
+                
+                return data?.Status == DataStatus.Local;
             });
         }
 
@@ -156,48 +136,39 @@ namespace Realms.LFS
 
             try
             {
-                var filePath = FileManager.GetFilePath(_config, details.DataId);
-                Console.WriteLine($"Uploading on {Environment.CurrentManagedThreadId}");
-                var url = await UploadFileCore(GetId(details.DataId), filePath);
-                Console.WriteLine($"Updating Realm on {Environment.CurrentManagedThreadId}");
+                var filePath = FileManager.GetFilePath(RealmConfig, details.DataId);
+                var url = await UploadFileCore(GetRemoteId(details.DataId), filePath);
                 var success = await _runner.Execute((realm) =>
                 {
-                    using (var transaction = realm.BeginWrite())
+                    using var transaction = realm.BeginWrite();
+                    var data = GetFileData(realm, details.DataId);
+
+                    if (data == null)
                     {
-                        var data = realm.Find<FileData>(details.DataId);
-
-                        if (data == null)
-                        {
-                            transaction.Rollback();
-                            return false;
-                        }
-
-                        data.Url = url;
-                        data.Status = DataStatus.Remote;
-                        transaction.Commit();
-
-                        return true;
+                        transaction.Rollback();
+                        return false;
                     }
+
+                    data.Url = url;
+                    data.Status = DataStatus.Remote;
+                    transaction.Commit();
+
+                    return true;
                 });
 
                 if (success)
                 {
-                    OnFileUploaded?.Invoke(this, new FileUploadedEventArgs
-                    {
-                        FileDataId = details.DataId,
-                        FilePath = filePath,
-                        RealmConfig = _config,
-                    });
+                    OnFileUploaded?.Invoke(this, new FileUploadedEventArgs(details.DataId, filePath, RealmConfig));
                 }
                 else
                 {
-                    Logger.Error($"Could not find data with Id: {details.DataId}");
-                    await DeleteFileCore(details.DataId);
+                    Logger.Default.Log(LogLevel.Error, $"Realm.LFS: Could not find data with Id: {details.DataId}");
+                    await DeleteFileCore(GetRemoteId(details.DataId));
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex.Message);
+                Logger.Default.Log(LogLevel.Error, $"Realm.LFS: An error occurred while uploading item: {ex}");
                 _ = Task.Delay(details.RetryAfter).ContinueWith(_ =>
                 {
                     EnqueueUpload(details.DataId, Math.Min(details.RetryAfter * 2, MaxRetryDelay));
@@ -205,18 +176,30 @@ namespace Realms.LFS
             }
         }
 
-        private string GetId(string dataId) => $"{_realmPathHash}/{dataId}";
+        private string GetRemoteId(Guid dataId) => $"{_realmPathHash}/{dataId}";
 
         private class UploadDetails
         {
-            public string DataId { get; }
+            public Guid DataId { get; }
             public int RetryAfter { get; }
 
-            public UploadDetails(string dataId, int retryAfter)
+            public UploadDetails(Guid dataId, int retryAfter)
             {
                 DataId = dataId;
                 RetryAfter = retryAfter;
             }
         }
+
+        private static IQueryable<FileData> GetFileDatas(Realm realm)
+        {
+            var result = typeof(Realm).GetMethod("AllEmbedded", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .MakeGenericMethod(typeof(FileData))
+                .Invoke(realm, null);
+
+            return (IQueryable<FileData>)result;
+        }
+
+        private static FileData? GetFileData(Realm realm, Guid id) =>
+            GetFileDatas(realm).FirstOrDefault(d => d.Id == id);
     }
 }
