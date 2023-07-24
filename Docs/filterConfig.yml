@@ -35,3 +35,9 @@ apiRules:
 - exclude:
     uidRegex: ^Realms.LFS.FileData.Parent
     type: Property
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.op_Explicit.Realms.RealmValue
+    type: Method
+- exclude:
+    uidRegex: ^Realms.LFS.FileData.op_Implicit.Realms.LFS.FileData
+    type: Method

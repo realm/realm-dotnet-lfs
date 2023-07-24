@@ -65,8 +65,8 @@ public void PopulateImage(Recipe recipe)
 
 ## Documentation
 
-API docs can be found at https://nirinchev.github.io/realm-lfs.
+API docs can be found at https://realm.github.io/realm-dotnet-lfs/.
 
 ## Customization
 
-The `RemoteFileManager` is the abstraction that takes care of uploading data to a remote file server. There are three reference implementations in this repo - [`FunctionsFileManager`](https://github.com/nirinchev/realm-lfs/blob/main/Realm.LFS.Functions/FunctionsFileManager.cs) [`S3FileManager`](https://github.com/nirinchev/realm-lfs/blob/main/Realm.LFS.S3/S3FileManager.cs) and [`AzureFileManager`](https://github.com/nirinchev/realm-lfs/blob/main/Realm.LFS.Azure/AzureFileManager.cs). If you want to use your own service, you can use them as inspiration.
+The `RemoteFileManager` is the abstraction that takes care of uploading data to a remote file server. There are three reference implementations in this repo - [`FunctionsFileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Functions/FunctionsFileManager.cs) [`S3FileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.S3/S3FileManager.cs) and [`AzureFileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Azure/AzureFileManager.cs). If you want to use your own service, you can use them as inspiration.
