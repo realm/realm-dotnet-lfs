@@ -9,7 +9,7 @@
     <Authors>Realm</Authors>
     <owners>realmnuget</owners>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/nirinchev/realm-lfs</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/realm/realm-dotnet-lfs</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageTags>Realm database lfs binary files</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

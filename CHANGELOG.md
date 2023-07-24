@@ -1,3 +1,11 @@
-# 1.0.0 Initial Release
+## 1.0.0 (2023-07-24)
 
-Initial release of the SDK.
+### Enhancements
+* Updated to support Realm 10.x and newer.
+
+### Fixed
+* None
+
+## 0.0.1 (2020-04-02)
+
+Initial release with support for Realm pre-v10.
