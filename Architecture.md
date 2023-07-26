@@ -1,6 +1,9 @@
 # Architecture
 
-The general flow of data in the library is as follows:
+![Architecture diagram](https://github.com/realm/realm-dotnet-lfs/assets/2315687/fb0ade9d-a0f0-4f73-952e-ad7917e16a9d)
+
+The diagram above roughly describes the functionality of the library, but the general flow is as follows:
+
 1. User creates `FileData` object ([code link](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L57))
 2. We store the Stream to a file on disk ([code link](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L59))
 3. We try to upload the file (with incremental backoffs on failure) ([code link](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L70))
@@ -9,6 +12,17 @@ The general flow of data in the library is as follows:
 The major components are briefly documented below.
 
 ## [`FileData`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs)
+
+This is an embedded object with the following structure:
+
+```ts
+{
+    Id: "uuid",
+    Status: "Local" | "Remote",
+    Url: "string?",
+    Name: "string?",
+}
+```
 
 This is the RealmObject that holds the metadata associated with the file. It is constructed with a binary source, which it then [persists in a temporary location](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L59). When the object is added to Realm, we [schedule the upload](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L70).
 
