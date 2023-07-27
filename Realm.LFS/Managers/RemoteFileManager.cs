@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Realms.LFS
 {
+    // I think that the names for FileManager and RemoteFileManager are a little confusing
+    // From the name, I would expect that this is a subclass of FileManager, while it's a different class
+    // and it's also owned by FileManager. FileManager seems to be both the "managing everything class" and the "LocalFileManager".
+    // Same for FunctionsFileManager, that I thought it would be a subclass of FileManager and not RemoteFileManager
     /// <summary>
     /// The base class for any remote file manager implementation. This will be used to upload local files
     /// to a remote storage provider, such as S3 or Azure.
