@@ -12,7 +12,7 @@ namespace Realms.LFS.Functions;
 /// An implementation of the <see cref="RemoteFileManager"/> that uploads data to a url supplied
 /// by an Atlas Function.
 /// </summary>
-public class FunctionsFileManager : RemoteFileManager
+public class FunctionsFileManager : RemoteFileManager //Maybe call this AtlasFunctions so it's a little bit more explicit? From the name I thought this was a generic FileManager with a function
 {
     private readonly string _function;
     private readonly HttpClient _client;

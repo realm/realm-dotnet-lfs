@@ -34,6 +34,7 @@ public static class FileManager
         _remoteManagerFactory = options.RemoteManagerFactory;
         
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        // What is DefaultRemoteManagerFactory?
         Argument.Ensure(_remoteManagerFactory != null, "Either a RemoteManagerFactory or DefaultRemoteManagerFactory must be provided.", nameof(options));
     }
 

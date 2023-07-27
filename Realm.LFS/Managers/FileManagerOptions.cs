@@ -7,6 +7,7 @@ namespace Realms.LFS
     /// </summary>
     public class FileManagerOptions
     {
+        //Maybe we should specify that is used only for temporary files, until they're moved into the realm folder
         /// <summary>
         /// The location where files will be stored.
         /// </summary>

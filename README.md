@@ -63,9 +63,11 @@ public void PopulateImage(Recipe recipe)
 }
 ```
 
-## Documentation
+## Documentation  //Maybe documentation should be after customization?
 
 API docs can be found at https://realm.github.io/realm-dotnet-lfs/.
+
+//Maybe add a link to Architecture.md somewhere
 
 ## Customization
 

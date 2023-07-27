@@ -23,7 +23,7 @@ This is an embedded object with the following structure:
     Name: "string?",
 }
 ```
-
+//This seems to be pointing at old code
 This is the RealmObject that holds the metadata associated with the file. It is constructed with a binary source, which it then [persists in a temporary location](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L59). When the object is added to Realm, we [schedule the upload](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/FileData.cs#L70).
 
 ## [`FileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/Managers/FileManager.cs)
@@ -39,6 +39,7 @@ This is the class that handles uploads and downloads from a remote file server. 
 
 The interesting pieces of that class deal with parallelizing uploads. All uploads are enqueued to `_uploadQueue` and picked up by `Executor` instances. If the [size of the queue exceeds twice](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/Helpers/ExecutorList.cs#L25-L42) the number of executors, a new executor is added up until `MaxExecutors`. Each executor dequeues an item from the queue and executes [`UploadItem`](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/Managers/RemoteFileManager.cs#L140) until the queue is empty, after which it removes itself.
 
+//There is an extra parenthesis on point 1 and I'm not sure I can follow the sentence completely
 Before each upload, we're checking whether the [item should be uploaded](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/Managers/RemoteFileManager.cs#L132-L135). There are two main cases when this check would return `false`:
 1. We're trying to upload an item that was not created on this device (so the file doesn't exist). This could be the case, where we've received a `FileData` from another device with `Status == Local`, the app was killed, then we've [enqueued all pending uploads](https://github.com/realm/realm-dotnet-lfs/blob/630b323b31e45a25fee9fac4bf745c8b9123c34a/Realm.LFS/Managers/RemoteFileManager.cs#L97), which happens on startup). This could obviously be done by filtering the items at time of enqueuing them, but since everything happens on a background thread, it doesn't make much difference.
 2. We're trying to upload a local item, that has already been deleted. This could be the case when the user deleted the associated `FileData` before the executors could pick up the item from the queue.
