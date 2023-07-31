@@ -4,9 +4,9 @@
 
 The diagram above roughly describes the functionality of the library, but the general flow is as follows:
 
-1. User creates `FileData` object ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L57))
-2. We store the Stream to a file on disk ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L59))
-3. We try to upload the file (with incremental backoffs on failure) ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L70))
+1. User creates `FileData` object ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L70))
+2. We store the Stream to a file on disk ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L72))
+3. We try to upload the file (with incremental backoffs on failure) ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L83))
 4. We update the `FileData` with the url of the newly uploaded file ([code link](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/Managers/RemoteStorageManager.cs#L143-L156))
 
 The major components are briefly documented below.
