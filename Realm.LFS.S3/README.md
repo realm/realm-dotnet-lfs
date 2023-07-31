@@ -29,7 +29,7 @@ To initialize the SDK, the minimum configuration you need to do is to configure 
 
 ```csharp
 var credentials = new AWSCredentials(...);
-FileManager.Initialize(new FileManagerOptions
+LFSManager.Initialize(new LFSOptions
 {
     RemoteManagerFactory = (config) => new S3StorageManager(config, credentials)
 });

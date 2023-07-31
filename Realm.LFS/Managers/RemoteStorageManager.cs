@@ -108,7 +108,7 @@ namespace Realms.LFS
 
         private async Task<bool> ShouldUpload(UploadDetails details)
         {
-            var filePath = FileManager.GetFilePath(RealmConfig, details.DataId);
+            var filePath = LFSManager.GetFilePath(RealmConfig, details.DataId);
             if (!File.Exists(filePath))
             {
                 return false;
@@ -136,7 +136,7 @@ namespace Realms.LFS
 
             try
             {
-                var filePath = FileManager.GetFilePath(RealmConfig, details.DataId);
+                var filePath = LFSManager.GetFilePath(RealmConfig, details.DataId);
                 var url = await UploadFileCore(GetRemoteId(details.DataId), filePath);
                 var success = await _runner.Execute((realm) =>
                 {

@@ -30,7 +30,7 @@ public class Recipe : RealmObject
 To initialize the SDK, the minimum configuration you need to do is to configure the remote manager factory:
 
 ```csharp
-FileManager.Initialize(new FileManagerOptions
+LFSManager.Initialize(new LFSOptions
 {
     RemoteManagerFactory = (config) => new FunctionsStorageManager(config, "MyDataFunction")
 });

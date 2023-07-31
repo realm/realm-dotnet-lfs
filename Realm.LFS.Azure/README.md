@@ -29,7 +29,7 @@ To initialize the SDK, the minimum configuration you need to do is to configure 
 
 ```csharp
 var connectionString = "...";
-FileManager.Initialize(new FileManagerOptions
+LFSManager.Initialize(new LFSOptions
 {
     RemoteManagerFactory = (config) => new AzureStorageManager(config, connectionString)
 });

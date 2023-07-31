@@ -9,7 +9,7 @@ namespace Realms.LFS;
 /// <summary>
 /// This is the class that controls how and where local files are stored.
 /// </summary>
-public static class FileManager
+public static class LFSManager
 {
     private static readonly ConcurrentDictionary<string, RemoteStorageManager> _remoteManagers = new();
 
@@ -22,13 +22,13 @@ public static class FileManager
     public static event EventHandler<FileUploadedEventArgs>? OnFileUploaded;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FileManager"/> class with the supplied options.
+    /// Initializes a new instance of the <see cref="LFSManager"/> class with the supplied options.
     /// </summary>
     /// <param name="options">
     /// Options that control the behavior of the file manager, such as where files are going to be stored, as well
     /// as a factory for constructing remote file managers.
     /// </param>
-    public static void Initialize(FileManagerOptions options)
+    public static void Initialize(LFSOptions options)
     {
         _persistenceLocation = options.PersistenceLocation ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "realm-lfs");
         _remoteManagerFactory = options.RemoteManagerFactory;

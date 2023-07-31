@@ -31,7 +31,7 @@ namespace DataPopulator
                 BaseFilePath = basePath,
             });
 
-            FileManager.Initialize(new FileManagerOptions
+            LFSManager.Initialize(new LFSOptions
             {
                 PersistenceLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "DataFunction")
@@ -65,9 +65,9 @@ namespace DataPopulator
                 }
             };
             using var realm = await Realm.GetInstanceAsync(config);
-            await FileManager.WaitForUploads(config);
+            await LFSManager.WaitForUploads(config);
             await Task.Delay(100);
-            await FileManager.WaitForUploads(config);
+            await LFSManager.WaitForUploads(config);
             using var client = new HttpClient();
             var users = bogusUser.Generate(UsersCount);
             await ExecuteInParallel(users, async u =>

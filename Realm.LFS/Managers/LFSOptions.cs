@@ -3,9 +3,9 @@
 namespace Realms.LFS
 {
     /// <summary>
-    /// The options controlling the <see cref="FileManager"/> behavior.
+    /// The options controlling the <see cref="LFSManager"/> behavior.
     /// </summary>
-    public class FileManagerOptions
+    public class LFSOptions
     {
         /// <summary>
         /// The location where files will be temporarily stored until they are uploaded.
