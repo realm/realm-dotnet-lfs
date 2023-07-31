@@ -8,7 +8,7 @@ using Realms.LFS.Functions;
 
 FileManager.Initialize(new()
 {
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "DataFunction")
+    RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "DataFunction")
 });
 
 UIApplication.Main(args, null, typeof(AppDelegate));

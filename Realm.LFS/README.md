@@ -32,7 +32,7 @@ To initialize the SDK, the minimum configuration you need to do is to configure 
 ```csharp
 FileManager.Initialize(new FileManagerOptions
 {
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "MyDataFunction")
+    RemoteManagerFactory = (config) => new FunctionsStorageManager(config, "MyDataFunction")
 });
 ```
 
@@ -68,9 +68,9 @@ public void PopulateImage(Recipe recipe)
 
 ## Customization
 
-There are 3 supplied implementations of `RemoteFileManager`, each shipped in a separate package:
+There are 3 supplied implementations of `RemoteStorageManager`, each shipped in a separate package:
 1. [`Realm.LFS.Functions`](https://www.nuget.org/packages/Realm.LFS.Functions) provides a file manager that calls an Atlas Function to obtain a pre-signed url. Then it uploads data to the retried url.
 2. [`Realm.LFS.S3`](https://www.nuget.org/packages/Realm.LFS.S3) uses the S3 SDK to upload files to an S3 bucket.
 3. [`Realm.LFS.Azure`](https://www.nuget.org/packages/Realm.LFS.Azure) uses the Azure SDK to upload files to Azure Blob Storage.
 
-If you use another service or have your own web server that can process the file uploads, you need to supply your own implementation of `RemoteFileManager`.
+If you use another service or have your own web server that can process the file uploads, you need to supply your own implementation of `RemoteStorageManager`.

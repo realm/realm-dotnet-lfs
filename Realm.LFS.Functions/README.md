@@ -2,7 +2,7 @@
 
 Realm LFS (large file storage) is an extension of the [Realm.NET SDK](http://github.com/realm/realm-dotnet) that exposes an abstraction for interacting with binary files that are transparently uploaded to a 3rd party service (e.g. S3/Azure Blob Storage) and their URL is subsequently updated in the Realm object for other clients to consume.
 
-This package supplies a `RemoteFileManager` implementation for the [`Realm.LFS`](https://www.nuget.org/packages/Realm.LFS) that uses an Atlas Function to obtain a pre-signed url, which it then uploads the files to.
+This package supplies a `RemoteStorageManager` implementation for the [`Realm.LFS`](https://www.nuget.org/packages/Realm.LFS) that uses an Atlas Function to obtain a pre-signed url, which it then uploads the files to.
 
 ## Usage
 
@@ -30,7 +30,7 @@ To initialize the SDK, the minimum configuration you need to do is to configure 
 ```csharp
 FileManager.Initialize(new FileManagerOptions
 {
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "MyDataFunction")
+    RemoteManagerFactory = (config) => new FunctionsStorageManager(config, "MyDataFunction")
 });
 ```
 

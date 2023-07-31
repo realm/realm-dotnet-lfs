@@ -12,8 +12,7 @@
 
   <Import Project="..\AssemblyInfo.props " />
 
-  <UsingTask TaskName="ExtractChangelog" TaskFactory="RoslynCodeTaskFactory"
-    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+  <UsingTask TaskName="ExtractChangelog" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
 
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true" />
@@ -43,8 +42,7 @@ catch (Exception ex)
     </Task>
   </UsingTask>
 
-  <Target Name="ExtractChangelogToPack" BeforeTargets="GenerateNuspec"
-    Condition="'$(CI)' == 'true'">
+  <Target Name="ExtractChangelogToPack" BeforeTargets="GenerateNuspec" Condition="'$(CI)' == 'true'">
     <Message Text="Extracting release note" />
     <ExtractChangelog FilePath="../CHANGELOG.md">
       <Output TaskParameter="ExtractedText" PropertyName="PackageReleaseNotes" />
@@ -52,7 +50,6 @@ catch (Exception ex)
   </Target>
 
   <Target Name="WriteChangelogToFile" AfterTargets="ExtractChangelogToPack">
-    <WriteLinesToFile File="../packages/ExtractedChangelog.md" Lines="$(PackageReleaseNotes)"
-      Overwrite="true" />
+    <WriteLinesToFile File="../packages/ExtractedChangelog.md" Lines="$(PackageReleaseNotes)" Overwrite="true" />
   </Target>
 </Project>

@@ -13,7 +13,7 @@ namespace Realms.LFS
     /// The base class for any remote file manager implementation. This will be used to upload local files
     /// to a remote storage provider, such as S3 or Azure.
     /// </summary>
-    public abstract class RemoteFileManager
+    public abstract class RemoteStorageManager
     {
         internal event EventHandler<FileUploadedEventArgs>? OnFileUploaded;
 
@@ -33,9 +33,9 @@ namespace Realms.LFS
         protected RealmConfigurationBase RealmConfig { get; }
 
         /// <summary>
-        /// Constructs a new <see cref="RemoteFileManager"/>.
+        /// Constructs a new <see cref="RemoteStorageManager"/>.
         /// </summary>
-        protected RemoteFileManager(RealmConfigurationBase config)
+        protected RemoteStorageManager(RealmConfigurationBase config)
         {
             RealmConfig = config;
 

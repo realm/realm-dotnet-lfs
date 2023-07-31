@@ -34,7 +34,7 @@ namespace DataPopulator
             FileManager.Initialize(new FileManagerOptions
             {
                 PersistenceLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                RemoteManagerFactory = (config) => new FunctionsFileManager(config, "DataFunction")
+                RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "DataFunction")
             });
 
             AsyncContext.Run(MainAsync);

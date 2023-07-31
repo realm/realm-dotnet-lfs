@@ -6,7 +6,7 @@ namespace Realms.LFS
 {
     /// <summary>
     /// The event args describing that a file has been successfully uploaded by the
-    /// <see cref="RemoteFileManager"/>.
+    /// <see cref="RemoteStorageManager"/>.
     /// </summary>
     public class FileUploadedEventArgs : EventArgs
     {
