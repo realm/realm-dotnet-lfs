@@ -1,5 +1,12 @@
 ## vNext (TBD)
 
+### Breaking Changes
+* Renamed `FileManager` to `LFSManager`.
+* Renamed `RemoteFileManager` to `RemoteStorageManager`.
+* Renamed `FunctionsFileManager` to `AtlasFunctionsStorageManager`.
+* Renamed `S3FileManager` to `S3StorageManager`.
+* Renamed `AzureFileManager` to `AzureStorageManager`.
+
 ### Enhancements
 * None
 
