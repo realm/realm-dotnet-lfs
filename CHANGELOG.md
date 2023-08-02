@@ -1,4 +1,4 @@
-## 1.1.0 (2023-08-02)
+## vNext (TBD)
 
 ### Breaking Changes
 * Renamed `FileManager` to `LFSManager`.
@@ -7,9 +7,14 @@
 * Renamed `S3FileManager` to `S3StorageManager`.
 * Renamed `AzureFileManager` to `AzureStorageManager`.
 
+### Enhancements
+* None
+
 ### Fixed
 * Fixed Realm.LFS.S3 readme.
 
+### Internal
+* None
 
 ## 1.0.0 (2023-07-24)
 
