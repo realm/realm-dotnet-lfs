@@ -3,7 +3,7 @@
   <PropertyGroup>
     <RootNamespace>Realms.LFS.Azure</RootNamespace>
     <Product>Realm LFS Azure</Product>
-    <Description>A RemoteFileManager for Realm.LFS that uploads files to Azure blob storage.</Description>
+    <Description>A RemoteStorageManager for Realm.LFS that uploads files to Azure blob storage.</Description>
   </PropertyGroup>
 
   <ItemGroup>

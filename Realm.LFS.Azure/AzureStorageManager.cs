@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 namespace Realms.LFS.Azure
 {
     /// <summary>
-    /// An implementation of the <see cref="RemoteFileManager"/> that uploads data to Azure.
+    /// An implementation of the <see cref="RemoteStorageManager"/> that uploads data to Azure.
     /// </summary>
-    public class AzureFileManager : RemoteFileManager
+    public class AzureStorageManager : RemoteStorageManager
     {
         private readonly CloudBlobContainer _container;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureFileManager"/> class with the
+        /// Initializes a new instance of the <see cref="AzureStorageManager"/> class with the
         /// supplied <paramref name="connectionString"/>.
         /// </summary>
         /// <param name="config">The config of the Realm this file manager is tracking.</param>
@@ -21,7 +21,7 @@ namespace Realms.LFS.Azure
         /// <param name="container">
         /// An optional argument indicating the container that will be used to upload data to.
         /// </param>
-        public AzureFileManager(RealmConfigurationBase config, string connectionString, string container = "realm-lfs-data")
+        public AzureStorageManager(RealmConfigurationBase config, string connectionString, string container = "realm-lfs-data")
             : base(config)
         {
             var account = CloudStorageAccount.Parse(connectionString);

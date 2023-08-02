@@ -6,9 +6,9 @@ using Realms.LFS.Functions;
 // If you want to use a different Application Delegate class from "AppDelegate"
 // you can specify it here.
 
-FileManager.Initialize(new()
+LFSManager.Initialize(new()
 {
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "DataFunction")
+    RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "DataFunction")
 });
 
 UIApplication.Main(args, null, typeof(AppDelegate));

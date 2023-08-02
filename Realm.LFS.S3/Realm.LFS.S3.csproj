@@ -3,7 +3,7 @@
   <PropertyGroup>
     <RootNamespace>Realms.LFS.S3</RootNamespace>
     <Product>Realm LFS S3</Product>
-    <Description>A RemoteFileManager for Realm.LFS that uploads files to AWS S3.</Description>
+    <Description>A RemoteStorageManager for Realm.LFS that uploads files to AWS S3.</Description>
   </PropertyGroup>
 
   <ItemGroup>

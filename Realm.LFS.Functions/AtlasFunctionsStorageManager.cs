@@ -9,22 +9,22 @@ using Realms.Sync;
 namespace Realms.LFS.Functions;
 
 /// <summary>
-/// An implementation of the <see cref="RemoteFileManager"/> that uploads data to a url supplied
+/// An implementation of the <see cref="RemoteStorageManager"/> that uploads data to a url supplied
 /// by an Atlas Function.
 /// </summary>
-public class FunctionsFileManager : RemoteFileManager
+public class AtlasFunctionsStorageManager : RemoteStorageManager
 {
     private readonly string _function;
     private readonly HttpClient _client;
     private readonly User _user;
     
     /// <summary>
-    /// Initializes a new instance of the <see cref="FunctionsFileManager"/> class.
+    /// Initializes a new instance of the <see cref="AtlasFunctionsStorageManager"/> class.
     /// </summary>
     /// <param name="config">The config of the Realm this file manager is tracking.</param>
     /// <param name="function">The Atlas Function that will be called to obtain pre-signed urls.</param>
     /// <param name="httpHandler">The http handler to be used when making the http requests.</param>
-    public FunctionsFileManager(RealmConfigurationBase config, string function, HttpMessageHandler? httpHandler = null)
+    public AtlasFunctionsStorageManager(RealmConfigurationBase config, string function, HttpMessageHandler? httpHandler = null)
         : base(config)
     {
         _function = function;

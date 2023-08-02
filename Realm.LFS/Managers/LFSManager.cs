@@ -9,12 +9,12 @@ namespace Realms.LFS;
 /// <summary>
 /// This is the class that controls how and where local files are stored.
 /// </summary>
-public static class FileManager
+public static class LFSManager
 {
-    private static readonly ConcurrentDictionary<string, RemoteFileManager> _remoteManagers = new();
+    private static readonly ConcurrentDictionary<string, RemoteStorageManager> _remoteManagers = new();
 
     private static string _persistenceLocation = null!;
-    private static Func<RealmConfigurationBase, RemoteFileManager> _remoteManagerFactory = null!;
+    private static Func<RealmConfigurationBase, RemoteStorageManager> _remoteManagerFactory = null!;
 
     /// <summary>
     /// An event invoked whenever a file has been uploaded successfully.
@@ -22,19 +22,19 @@ public static class FileManager
     public static event EventHandler<FileUploadedEventArgs>? OnFileUploaded;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FileManager"/> class with the supplied options.
+    /// Initializes a new instance of the <see cref="LFSManager"/> class with the supplied options.
     /// </summary>
     /// <param name="options">
     /// Options that control the behavior of the file manager, such as where files are going to be stored, as well
     /// as a factory for constructing remote file managers.
     /// </param>
-    public static void Initialize(FileManagerOptions options)
+    public static void Initialize(LFSOptions options)
     {
-        _persistenceLocation = options.PersistenceLocation ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        _persistenceLocation = options.PersistenceLocation ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "realm-lfs");
         _remoteManagerFactory = options.RemoteManagerFactory;
-        
+
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        Argument.Ensure(_remoteManagerFactory != null, "Either a RemoteManagerFactory or DefaultRemoteManagerFactory must be provided.", nameof(options));
+        Argument.Ensure(_remoteManagerFactory != null, "A RemoteManagerFactory must be provided.", nameof(options));
     }
 
     /// <summary>
@@ -45,12 +45,6 @@ public static class FileManager
     public static Task WaitForUploads(RealmConfigurationBase config)
     {
         return GetManager(config).WaitForUploads();
-    }
-
-    internal static Stream? ReadFile(ObjectId id)
-    {
-        var path = Path.Combine(GetTempPath(), id.ToString());
-        return File.Exists(path) ? File.OpenRead(path) : null;
     }
 
     internal static async Task<Stream?> ReadFile(FileData data)
@@ -91,12 +85,6 @@ public static class FileManager
         return Path.Combine(GetTempPath(), data.Id.ToString());
     }
 
-    internal static bool FileExists(string id)
-    {
-        var path = Path.Combine(GetTempPath(), id);
-        return File.Exists(path);
-    }
-
     internal static void WriteFile(Guid id, Stream stream)
     {
         var filePath = Path.Combine(GetTempPath(), id.ToString());
@@ -112,12 +100,6 @@ public static class FileManager
         }
 
         stream.CopyTo(fs);
-    }
-
-    internal static void CopyFile(Guid id, string file)
-    {
-        var targetFile = Path.Combine(GetTempPath(), id.ToString());
-        File.Copy(file, targetFile, overwrite: true);
     }
 
     internal static void UploadFile(FileData data)
@@ -148,7 +130,7 @@ public static class FileManager
         return folderPath;
     }
 
-    private static RemoteFileManager GetManager(RealmConfigurationBase config)
+    private static RemoteStorageManager GetManager(RealmConfigurationBase config)
     {
         return _remoteManagers.GetOrAdd(config.DatabasePath, _ =>
         {

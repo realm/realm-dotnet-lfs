@@ -5,7 +5,7 @@
     <RootNamespace>Realms.LFS.Functions</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Product>Realm LFS Atlas Functions</Product>
-    <Description>A RemoteFileManager for Realm.LFS that calls an Atlas Function to obtain a
+    <Description>A RemoteStorageManager for Realm.LFS that calls an Atlas Function to obtain a
       pre-signed url for file uploads.</Description>
   </PropertyGroup>
 

@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 namespace Realms.LFS.S3
 {
     /// <summary>
-    /// An implementation of the <see cref="RemoteFileManager"/> that uploads data to AWS S3.
+    /// An implementation of the <see cref="RemoteStorageManager"/> that uploads data to AWS S3.
     /// </summary>
-    public class S3FileManager : RemoteFileManager
+    public class S3StorageManager : RemoteStorageManager
     {
         private readonly AmazonS3Client _s3Client;
         private readonly string _bucket;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="S3FileManager"/> class with the
+        /// Initializes a new instance of the <see cref="S3StorageManager"/> class with the
         /// supplied <paramref name="credentials"/>.
         /// </summary>
         /// <param name="config">The config of the Realm this file manager is tracking.</param>
@@ -25,7 +25,7 @@ namespace Realms.LFS.S3
         /// <param name="bucket">
         /// An optional argument indicating the bucket that will be used to upload data to.
         /// </param>
-        public S3FileManager(RealmConfigurationBase config, AWSCredentials credentials, RegionEndpoint region, string bucket = "realm-lfs-data")
+        public S3StorageManager(RealmConfigurationBase config, AWSCredentials credentials, RegionEndpoint region, string bucket = "realm-lfs-data")
             : base(config)
         {
             _s3Client = new AmazonS3Client(credentials, region);

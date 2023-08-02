@@ -11,9 +11,9 @@ Using binary data (i.e. `byte[]` properties) with Realm is supported but very in
 To initialize the SDK, the minimum configuration you need to do is to configure the remote manager factory:
 
 ```csharp
-FileManager.Initialize(new FileManagerOptions
+LFSManager.Initialize(new LFSOptions
 {
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "MyDataFunction")
+    RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "MyDataFunction")
 });
 ```
 
@@ -63,10 +63,14 @@ public void PopulateImage(Recipe recipe)
 }
 ```
 
+## Customization
+
+The `RemoteStorageManager` is the abstraction that takes care of uploading data to a remote file server. There are three reference implementations in this repo - [`AtlasFunctionsStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Functions/AtlasFunctionsStorageManager.cs) [`S3StorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.S3/S3StorageManager.cs) and [`AzureStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Azure/AzureStorageManager.cs). If you want to use your own service, you can use them as inspiration.
+
 ## Documentation
 
 API docs can be found at https://realm.github.io/realm-dotnet-lfs/.
 
-## Customization
+## Architecture
 
-The `RemoteFileManager` is the abstraction that takes care of uploading data to a remote file server. There are three reference implementations in this repo - [`FunctionsFileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Functions/FunctionsFileManager.cs) [`S3FileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.S3/S3FileManager.cs) and [`AzureFileManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Azure/AzureFileManager.cs). If you want to use your own service, you can use them as inspiration.
+[`Architecture.md`](https://github.com/realm/realm-dotnet-lfs/blob/main/Architecture.md) contains an overview of the library architecture.

@@ -28,7 +28,7 @@ public partial class FileData : IEmbeddedObject
     /// <c>null</c> will be returned. Finally, if <see cref="Status"/> is <see cref="DataStatus.Remote"/>, the file will be
     /// downloaded locally before a stream is returned.
     /// </remarks>
-    public Task<Stream?> GetStream() => FileManager.ReadFile(this);
+    public Task<Stream?> GetStream() => LFSManager.ReadFile(this);
 
     private int StatusInt { get; set; }
 
@@ -48,7 +48,7 @@ public partial class FileData : IEmbeddedObject
     /// the contents of the <see cref="FileData"/>. The file may not exist if the data hasn't been downloaded yet.
     /// </summary>
     /// <value>The local path to the file data contents.</value>
-    public string LocalUrl => FileManager.GetFilePath(this);
+    public string LocalUrl => LFSManager.GetFilePath(this);
 
     /// <summary>
     /// The remote url of this <see cref="FileData"/>. The value may be <c>null</c> if the file hasn't been uploaded yet.
@@ -69,7 +69,7 @@ public partial class FileData : IEmbeddedObject
     /// <param name="name">The name of the file.</param>
     public FileData(Stream data, string? name = null)
     {
-        FileManager.WriteFile(Id, data);
+        LFSManager.WriteFile(Id, data);
         Name = name;
         Status = DataStatus.Local;
     }
@@ -80,7 +80,7 @@ public partial class FileData : IEmbeddedObject
         {
             // TODO: That's not very efficient - it checks for file existence
             // on every instantiation - we should be able to do it more efficiently 
-            FileManager.UploadFile(this);
+            LFSManager.UploadFile(this);
         }
     }
 
