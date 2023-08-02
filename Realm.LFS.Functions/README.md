@@ -30,7 +30,7 @@ To initialize the SDK, the minimum configuration you need to do is to configure 
 ```csharp
 LFSManager.Initialize(new LFSOptions
 {
-    RemoteManagerFactory = (config) => new FunctionsStorageManager(config, "MyDataFunction")
+    RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "MyDataFunction")
 });
 ```
 

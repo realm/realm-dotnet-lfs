@@ -24,13 +24,13 @@ This is an embedded object with the following structure:
 }
 ```
 
-This is the RealmObject that holds the metadata associated with the file. It is constructed with a binary source, which it then [persists in a temporary location](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L59). When the object is added to Realm, we [schedule the upload](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L70).
+This is the EmbeddedObject that holds the metadata associated with the file. It is constructed with a binary source, which it then [persists in a temporary location](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L59). When the object is added to Realm, we [schedule the upload](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L70).
 
 ## [`LFSManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/Managers/LFSManager.cs)
 
 This is the class that contains most of the orchestration logic and for the most part deals with local files. It exposes internal methods for filesystem manipulation (reading, deleting, etc.), as well as enqueuing files for upload. There are two main file locations:
 
-1. `Temporary`: this is where we store all files for `FileData`-s that were created, but have not yet been added to Realm.
+1. `Temporary`: this is where we store all files for `FileData`-s that were created, but have not yet been added to Realm. The default location is `Documents/realm-lfs` but can be customized by specifying `LFSOptions.PersistenceLocation`.
 3. `*path-to-realm*/.lfs`: this is where we store all files that are pending upload. When [`FileData.GetStream()`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/FileData.cs#L22) is called on a FileData with `Status == Local`, this is where we try to find the file from. When `Status == Remote`, this is where we [download the file](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/Managers/LFSManager.cs#L50-L54) to (so the client that created the image will almost never have to download it again).
 
 ## [`RemoteStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS/Managers/RemoteStorageManager.cs)

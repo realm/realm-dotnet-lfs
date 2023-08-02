@@ -13,7 +13,7 @@ To initialize the SDK, the minimum configuration you need to do is to configure 
 ```csharp
 LFSManager.Initialize(new LFSOptions
 {
-    RemoteManagerFactory = (config) => new FunctionsStorageManager(config, "MyDataFunction")
+    RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "MyDataFunction")
 });
 ```
 
@@ -65,7 +65,7 @@ public void PopulateImage(Recipe recipe)
 
 ## Customization
 
-The `RemoteStorageManager` is the abstraction that takes care of uploading data to a remote file server. There are three reference implementations in this repo - [`FunctionsStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Functions/FunctionsStorageManager.cs) [`S3StorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.S3/S3StorageManager.cs) and [`AzureStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Azure/AzureStorageManager.cs). If you want to use your own service, you can use them as inspiration.
+The `RemoteStorageManager` is the abstraction that takes care of uploading data to a remote file server. There are three reference implementations in this repo - [`AtlasFunctionsStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Functions/AtlasFunctionsStorageManager.cs) [`S3StorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.S3/S3StorageManager.cs) and [`AzureStorageManager`](https://github.com/realm/realm-dotnet-lfs/blob/main/Realm.LFS.Azure/AzureStorageManager.cs). If you want to use your own service, you can use them as inspiration.
 
 ## Documentation
 
