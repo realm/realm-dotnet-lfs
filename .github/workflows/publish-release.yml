@@ -26,7 +26,7 @@ jobs:
     - name: Publish packages
       run: |
         dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Azure${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Azure.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
         dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Functions.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
         dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.S3.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
     - name: Find Release PR
