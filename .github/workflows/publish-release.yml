@@ -23,12 +23,12 @@ jobs:
         pkgVersion=$(find . -type f -regex ".*Realm\.LFS\.[1-9].*.nupkg" -exec basename {} \; | sed -n 's/Realm\.LFS\.\(.*\)\.nupkg$/\1/p')
         echo "version=$pkgVersion" >> $GITHUB_OUTPUT
       shell: bash
-    # - name: Publish packages
-    #   run: |
-    #     dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-    #     dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Azure${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-    #     dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Functions.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-    #     dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.S3.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Publish packages
+      run: |
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Azure${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Functions.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.S3.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
     - name: Find Release PR
       uses: juliangruber/find-pull-request-action@afdd62ccd2d4c55f5bdb154b489b85fc4cbcb9c1
       id: find-pull-request
