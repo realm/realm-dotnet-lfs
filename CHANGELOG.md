@@ -1,3 +1,14 @@
+## vNext (TBD)
+
+### Enhancements
+* None
+
+### Fixed
+* None
+
+### Internal
+* None
+
 ## 1.1.0 (2023-08-02)
 
 ### Breaking Changes
