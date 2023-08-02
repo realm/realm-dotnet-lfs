@@ -1,6 +1,86 @@
 name: Publish Release
 "on": workflow_dispatch
 jobs:
+  main:
+    runs-on: windows-latest
+    environment: Production
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Download all artifacts
+      uses: dawidd6/action-download-artifact@46b4ae883bf0726f5949d025d31cb62c7a5ac70c
+      with:
+        workflow: pr.yml
+        commit: ${{ github.sha }}
+        path: ${{ github.workspace }}
+        workflow_conclusion: completed
+    - name: Read version
+      id: get-version
+      run: |
+        cd Packages
+        pkgVersion=$(find . -type f -regex ".*Realm\.LFS\.[1-9].*.nupkg" -exec basename {} \; | sed -n 's/Realm\.LFS\.\(.*\)\.nupkg$/\1/p')
+        echo "version=$pkgVersion" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Publish packages
+      run: |
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Azure.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.Functions.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push ${{ github.workspace }}/Packages/Realm.LFS.S3.${{ steps.get-version.outputs.version }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Find Release PR
+      uses: juliangruber/find-pull-request-action@afdd62ccd2d4c55f5bdb154b489b85fc4cbcb9c1
+      id: find-pull-request
+      with:
+        branch: ${{ github.ref }}
+    - name: Merge Pull Request
+      uses: juliangruber/merge-pull-request-action@333730196b34b74936aad75a4e31c23a57582d14
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        number: ${{ steps.find-pull-request.outputs.number }}
+        method: squash
+    - name: Publish Github Release
+      uses: ncipollo/release-action@3ac4132803a6419fa2a7f4e9dbd1d93fceb690b9
+      with:
+        bodyFile: Packages/ExtractedChangelog.md
+        name: ${{ steps.get-version.outputs.version }}
+        commit: main
+        tag: ${{ steps.get-version.outputs.version }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: false
+    - name: Update Changelog
+      run: |
+        echo "## vNext (TBD)
+
+        ### Enhancements
+        * None
+
+        ### Fixed
+        * None
+
+        ### Internal
+        * None
+        " | cat - CHANGELOG.md >> temp
+        mv temp CHANGELOG.md
+      shell: bash
+    - name: Create vNext PR
+      id: vnext-pr
+      uses: peter-evans/create-pull-request@6c704eb7a8ba1daa13da0dcea9bb93a4fe530275
+      with:
+        branch: prepare-vnext
+        title: Prepare for vNext
+        body: Update Changelog for vNext
+        delete-branch: true
+        base: main
+        commit-message: Prepare for vNext
+    - name: Merge Pull Request
+      uses: juliangruber/merge-pull-request-action@333730196b34b74936aad75a4e31c23a57582d14
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        number: ${{ steps.vnext-pr.outputs.pull-request-number }}
+        method: squash
+
   deploy-docs:
     environment:
       name: github-pages
@@ -10,6 +90,7 @@ jobs:
       pages: write
       id-token: write
     runs-on: ubuntu-latest
+    needs: [ main ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
