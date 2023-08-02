@@ -10,13 +10,13 @@ The Realm.LFS package is available on NuGet. To install it, run the following co
 dotnet add package Realm.LFS
 ```
 
-It provides the basic building blocks for working with binary data. In addition to it, there are 3 packages that provide an implementation for the `RemoteFileManager`:
+It provides the basic building blocks for working with binary data. In addition to it, there are 3 packages that provide an implementation for the `RemoteStorageManager`:
 
 1. [`Realm.LFS.Functions`](https://www.nuget.org/packages/Realm.LFS.Functions) provides a file manager that calls an Atlas Function to obtain a pre-signed url. Then it uploads data to the retried url.
 2. [`Realm.LFS.S3`](https://www.nuget.org/packages/Realm.LFS.S3) uses the S3 SDK to upload files to an S3 bucket.
 3. [`Realm.LFS.Azure`](https://www.nuget.org/packages/Realm.LFS.Azure) uses the Azure SDK to upload files to Azure Blob Storage.
 
-If you use another service or have your own web server that can process the file uploads, you need to supply your own implementation of `RemoteFileManager`.
+If you use another service or have your own web server that can process the file uploads, you need to supply your own implementation of `RemoteStorageManager`.
 
 ## Usage
 
@@ -42,9 +42,9 @@ public class Recipe : RealmObject
 To initialize the SDK, the minimum configuration you need to do is to configure the remote manager factory:
 
 ```csharp
-FileManager.Initialize(new FileManagerOptions
+LFSManager.Initialize(new LFSOptions
 {
-    RemoteManagerFactory = (config) => new FunctionsFileManager(config, "MyDataFunction")
+    RemoteManagerFactory = (config) => new AtlasFunctionsStorageManager(config, "MyDataFunction")
 });
 ```
 
