@@ -10,7 +10,7 @@ jobs:
   main:
     runs-on: windows-latest
     environment: Production
-    if: github.event.inputs.docs-only
+    if: ${{ !github.event.inputs.docs-only }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
